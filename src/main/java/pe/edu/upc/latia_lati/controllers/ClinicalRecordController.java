@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.latia_lati.dtos.ClinicalRecordDTO;
+import pe.edu.upc.latia_lati.dtos.CountMedicalConditionDTO;
 import pe.edu.upc.latia_lati.entities.ClinicalRecord;
 import pe.edu.upc.latia_lati.entities.HealthProfile;
 import pe.edu.upc.latia_lati.entities.MedicalCondition;
@@ -135,24 +136,7 @@ public class ClinicalRecordController {
         clinicalRecord.setTitle(dto.getTitle());
         clinicalRecord.setDescription(dto.getDescription());
         clinicalRecord.setEventDate(dto.getEventDate());
-        clinicalRecord.setEventTime(dto.getEventTime());
-        clinicalRecord.setNotes(dto.getNotes());
         clinicalRecord.setProfessionalName(dto.getProfessionalName());
-        clinicalRecord.setFacilityLabel(dto.getFacilityLabel());
-        clinicalRecord.setExamType(dto.getExamType());
-        clinicalRecord.setPrescriptionExpiresOn(dto.getPrescriptionExpiresOn());
-        clinicalRecord.setGeneralInstructions(dto.getGeneralInstructions());
-        clinicalRecord.setSubstance(dto.getSubstance());
-        clinicalRecord.setReaction(dto.getReaction());
-        clinicalRecord.setAllergySeverity(dto.getAllergySeverity());
-        clinicalRecord.setAllergyConfirmed(dto.getAllergyConfirmed());
-        clinicalRecord.setAllergyCurrent(dto.getAllergyCurrent());
-        clinicalRecord.setSpeciality(dto.getSpeciality());
-        clinicalRecord.setAppointmentLocation(dto.getAppointmentLocation());
-        clinicalRecord.setDurationMinutes(dto.getDurationMinutes());
-        clinicalRecord.setAppointmentStatus(dto.getAppointmentStatus());
-        clinicalRecord.setApproximateDiagnosisAge(dto.getApproximateDiagnosisAge());
-        clinicalRecord.setConditionStatus(dto.getConditionStatus());
 
 
         // 5. Asignar el perfil de salud y condición médica existente
@@ -180,13 +164,38 @@ public class ClinicalRecordController {
                         )
                 );
 
-        // 2. Colocar la fecha de eliminación
-        cr.setDeletedAt(OffsetDateTime.now(ZoneOffset.UTC));
-
-        // 3. Guardar la actualización
+        // 2. Guardar la actualización
         crS.update(cr);
 
-        // 4. Responder
+        // 3. Responder
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/tipo/{tipo}")
+    public ResponseEntity<List<ClinicalRecordDTO>> buscarPorTipo(
+            @PathVariable String tipo) {
+
+        List<ClinicalRecordDTO> lista = crS.obtenerPorTipo(tipo)
+                .stream()
+                .map(c -> modelMapper.map(c, ClinicalRecordDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/reporte/condiciones")
+    public ResponseEntity<List<CountMedicalConditionDTO>> cantidadPorCondicion() {
+
+        List<CountMedicalConditionDTO> lista = crS.cantidadPorCondicionMedica()
+                .stream()
+                .map(resultado -> {
+                    CountMedicalConditionDTO dto = new CountMedicalConditionDTO();
+                    dto.setConditionName((String) resultado[0]);
+                    dto.setTotalRecords(((Number) resultado[1]).intValue());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(lista);
     }
 }

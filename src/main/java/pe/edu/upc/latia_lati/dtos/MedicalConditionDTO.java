@@ -12,9 +12,6 @@ public class MedicalConditionDTO {
     @NotBlank(message = "La descripción de la condición médica es obligatoria")
     private String descriptionMedicalCondition;
 
-    @NotNull(message = "El estado es obligatorio")
-    private Boolean active;
-
     public Long getIdMedicalCondition() {
         return idMedicalCondition;
     }
@@ -37,13 +34,5 @@ public class MedicalConditionDTO {
 
     public void setDescriptionMedicalCondition(String descriptionMedicalCondition) {
         this.descriptionMedicalCondition = descriptionMedicalCondition;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 }

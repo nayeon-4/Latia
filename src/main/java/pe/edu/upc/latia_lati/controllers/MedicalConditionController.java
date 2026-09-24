@@ -84,7 +84,6 @@ public class MedicalConditionController {
 
         mc.setNameMedicalCondition(dto.getNameMedicalCondition());
         mc.setDescriptionMedicalCondition(dto.getDescriptionMedicalCondition());
-        mc.setActive(dto.getActive());
 
         mcS.update(mc);
 

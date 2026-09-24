@@ -10,34 +10,44 @@ import java.util.Optional;
 
 @Service
 public class ClinicalRecordImplement implements IClinicalRecordService {
-    private final IClinicalRecordRepository crS;
+    private final IClinicalRecordRepository crR;
 
-    public ClinicalRecordImplement(IClinicalRecordRepository crS) {
-        this.crS = crS;
+    public ClinicalRecordImplement(IClinicalRecordRepository crR) {
+        this.crR = crR;
     }
 
     @Override
     public void insert(ClinicalRecord clinicalRecord) {
-        crS.save(clinicalRecord);
+        crR.save(clinicalRecord);
     }
 
     @Override
     public List<ClinicalRecord> list() {
-        return crS.findAll();
+        return crR.findAll();
     }
 
     @Override
     public void update(ClinicalRecord clinicalRecord) {
-        crS.save(clinicalRecord);
+        crR.save(clinicalRecord);
     }
 
     @Override
     public void delete(Long idClinicalRecord) {
-        crS.deleteById(idClinicalRecord);
+        crR.deleteById(idClinicalRecord);
     }
 
     @Override
     public Optional<ClinicalRecord> listId(Long id) {
-        return crS.findById(id);
+        return crR.findById(id);
+    }
+
+    @Override
+    public List<ClinicalRecord> obtenerPorTipo(String recordType) {
+        return crR.findByRecordType(recordType);
+    }
+
+    @Override
+    public List<Object[]> cantidadPorCondicionMedica() {
+        return crR.getTotalClinicalRecordsByCondition();
     }
 }

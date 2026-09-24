@@ -15,17 +15,14 @@ public class MedicalCondition {
     @Column(name = "descriptionMedicalCondition", nullable = false, length = 255)
     private String descriptionMedicalCondition;
 
-    @Column(name = "active", nullable = false)
-    private Boolean active;
 
     public MedicalCondition() {
     }
 
-    public MedicalCondition(Long idMedicalCondition, String nameMedicalCondition, String descriptionMedicalCondition, Boolean active) {
+    public MedicalCondition(Long idMedicalCondition, String nameMedicalCondition, String descriptionMedicalCondition) {
         this.idMedicalCondition = idMedicalCondition;
         this.nameMedicalCondition = nameMedicalCondition;
         this.descriptionMedicalCondition = descriptionMedicalCondition;
-        this.active = active;
     }
 
     public Long getIdMedicalCondition() {
@@ -50,13 +47,5 @@ public class MedicalCondition {
 
     public void setDescriptionMedicalCondition(String descriptionMedicalCondition) {
         this.descriptionMedicalCondition = descriptionMedicalCondition;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 }
