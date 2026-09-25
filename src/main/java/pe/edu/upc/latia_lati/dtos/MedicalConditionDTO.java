@@ -1,7 +1,6 @@
 package pe.edu.upc.latia_lati.dtos;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public class MedicalConditionDTO {
     private Long idMedicalCondition;

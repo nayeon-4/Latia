@@ -16,8 +16,6 @@ import pe.edu.upc.latia_lati.serviceinterfaces.IHealthProfileService;
 import pe.edu.upc.latia_lati.serviceinterfaces.IMedicalConditionService;
 
 import java.net.URI;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
