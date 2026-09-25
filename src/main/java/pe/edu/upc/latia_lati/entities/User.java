@@ -12,18 +12,19 @@ import java.time.OffsetDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long idUser;
 
-    @Column(name = "firstName", nullable = false, length = 100)
+    @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false, length = 100)
+    @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
     @Column(name = "email", nullable = false, length = 150, unique = true)
     private String email;
 
-    @Column(name = "passwordHash", nullable = false, length = 255)
+    @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
     @Column(name = "active", nullable = false)

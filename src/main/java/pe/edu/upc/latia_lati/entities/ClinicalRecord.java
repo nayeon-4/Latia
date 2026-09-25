@@ -1,12 +1,14 @@
 package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Time;
 import java.time.OffsetDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "clinical_records")
@@ -16,7 +18,7 @@ public class ClinicalRecord {
     private Long idClinicalRecord;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "idHealthProfile", nullable = false)
+    @JoinColumn(name = "health_profile_id", nullable = false)
     private HealthProfile healthProfile;
 
     @Column(name = "recordType", nullable = false, length = 20)
@@ -80,8 +82,20 @@ public class ClinicalRecord {
     private String appointmentStatus;
 
     @ManyToOne
-    @JoinColumn(name = "idCondition", nullable = false)
+    @JoinColumn(name = "condition_id", nullable = false)
     private MedicalCondition medicalCondition;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "clinicalRecord")
+    private List<ExamResult> examResults;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "clinicalRecord")
+    private List<MedicationTreatment> medicationTreatments;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "clinicalRecord")
+    private List<ClinicalRecordDocument> clinicalRecordDocuments;
 
     @Column(name = "approximateDiagnosisAge", nullable = false)
     private Short approximateDiagnosisAge;
