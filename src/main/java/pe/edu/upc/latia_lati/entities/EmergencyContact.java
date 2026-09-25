@@ -12,10 +12,11 @@ import java.time.OffsetDateTime;
 public class EmergencyContact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long idEmergencyContact;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "idHealthProfile", nullable = false)
+    @JoinColumn(name = "health_profile_id", nullable = false)
     private HealthProfile healthProfile;
 
     @Column(name = "name", nullable = false, length = 150)

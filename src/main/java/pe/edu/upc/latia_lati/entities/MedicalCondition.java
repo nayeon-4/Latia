@@ -7,12 +7,13 @@ import jakarta.persistence.*;
 public class MedicalCondition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long idMedicalCondition;
 
-    @Column(name = "nameMedicalCondition", nullable = false, length = 150)
+    @Column(name = "name", nullable = false, length = 150)
     private String nameMedicalCondition;
 
-    @Column(name = "descriptionMedicalCondition", nullable = false, length = 255)
+    @Column(name = "description", nullable = true, length = 255)
     private String descriptionMedicalCondition;
 
 

@@ -1,40 +1,43 @@
 package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "health_profiles")
 public class HealthProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long idHealthProfile;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "idOwnerUser", nullable = false)
+    @JoinColumn(name = "owner_user_id", nullable = false)
     private User ownerUser;
 
     @OneToOne(optional = true)
-    @JoinColumn(name = "idHolderUser", nullable = true, unique = true)
+    @JoinColumn(name = "holder_user_id", nullable = true, unique = true)
     private User holderUser;
 
-    @Column(name = "firstName", nullable = false, length = 100)
+    @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false, length = 100)
+    @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @Column(name = "birthDate", nullable = true)
+    @Column(name = "birth_date", nullable = true)
     private LocalDate birthDate;
 
     @Column(name = "sex", nullable = true, length = 30)
     private String sex;
 
-    @Column(name = "bloodType", nullable = true, length = 5)
+    @Column(name = "blood_type", nullable = true, length = 5)
     private String bloodType;
 
     @Column(name = "phone", nullable = true, length = 30)
@@ -50,6 +53,18 @@ public class HealthProfile {
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = true)
     private OffsetDateTime updatedAt;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "originProfile")
+    private List<FamilyRelationship> familyRelationships;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "relativeProfile")
+    private List<FamilyRelationship> relatedToProfiles;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "healthProfile")
+    private List<MedicalDocument> medicalDocuments;
 
     public HealthProfile() {
 
