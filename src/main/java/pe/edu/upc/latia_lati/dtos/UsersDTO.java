@@ -25,7 +25,6 @@ public class UsersDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private LocalDate createdAt;
 

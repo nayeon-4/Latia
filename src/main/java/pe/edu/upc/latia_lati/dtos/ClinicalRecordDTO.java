@@ -9,6 +9,8 @@ import java.util.Date;
 public class ClinicalRecordDTO {
     private Long idClinicalRecord;
 
+    @NotNull(message = "El ID del perfil de salud es obligatorio")
+    @Positive(message = "El ID del perfil de salud debe ser positivo")
     private Long idHealthProfile;
 
     @NotBlank(message = "El tipo de historia médica es obligatorio")

@@ -8,8 +8,11 @@ import jakarta.validation.constraints.*;
 public class HealthProfileDTO {
     private Long idHealthProfile;
 
+    @NotNull(message = "El ID del usuario propietario es obligatorio")
+    @Positive(message = "El ID del usuario propietario debe ser positivo")
     private Long idOwnerUser;
 
+    @Positive(message = "El ID del usuario titular debe ser positivo")
     private Long idHolderUser;
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -34,7 +37,6 @@ public class HealthProfileDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private LocalDate createdAt;
 
