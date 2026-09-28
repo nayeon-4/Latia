@@ -5,7 +5,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "health_profiles")
@@ -16,11 +15,11 @@ public class HealthProfile {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idOwnerUser", nullable = false)
-    private User ownerUser;
+    private Users ownerUser;
 
     @OneToOne(optional = true)
     @JoinColumn(name = "idHolderUser", nullable = true, unique = true)
-    private User holderUser;
+    private Users holderUser;
 
     @Column(name = "firstName", nullable = false, length = 100)
     private String firstName;
@@ -45,29 +44,14 @@ public class HealthProfile {
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private LocalDate createdAt;
 
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = true)
-    private OffsetDateTime updatedAt;
+    private LocalDate updatedAt;
 
     public HealthProfile() {
 
-    }
-
-    public HealthProfile(Long idHealthProfile, User ownerUser, User holderUser, String firstName, String lastName, LocalDate birthDate, String sex, String bloodType, String phone, Boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
-        this.idHealthProfile = idHealthProfile;
-        this.ownerUser = ownerUser;
-        this.holderUser = holderUser;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.sex = sex;
-        this.bloodType = bloodType;
-        this.phone = phone;
-        this.active = active;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getIdHealthProfile() {
@@ -78,19 +62,19 @@ public class HealthProfile {
         this.idHealthProfile = idHealthProfile;
     }
 
-    public User getOwnerUser() {
+    public Users getOwnerUser() {
         return ownerUser;
     }
 
-    public void setOwnerUser(User ownerUser) {
+    public void setOwnerUser(Users ownerUser) {
         this.ownerUser = ownerUser;
     }
 
-    public User getHolderUser() {
+    public Users getHolderUser() {
         return holderUser;
     }
 
-    public void setHolderUser(User holderUser) {
+    public void setHolderUser(Users holderUser) {
         this.holderUser = holderUser;
     }
 
@@ -150,19 +134,19 @@ public class HealthProfile {
         this.active = active;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ClinicalRecordImplement implements IClinicalRecordService {
+public class ClinicalRecordServiceImplement implements IClinicalRecordService {
     private final IClinicalRecordRepository crR;
 
-    public ClinicalRecordImplement(IClinicalRecordRepository crR) {
+    public ClinicalRecordServiceImplement(IClinicalRecordRepository crR) {
         this.crR = crR;
     }
 

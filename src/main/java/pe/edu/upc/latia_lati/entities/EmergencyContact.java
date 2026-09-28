@@ -5,7 +5,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "emergency_contacts")
@@ -32,25 +31,14 @@ public class EmergencyContact {
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private LocalDate createdAt;
 
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = true)
-    private OffsetDateTime updatedAt;
+    private LocalDate updatedAt;
 
     public EmergencyContact() {
 
-    }
-
-    public EmergencyContact(Long idEmergencyContact, HealthProfile healthProfile, String name, String phone, String relationship, Boolean primaryContact, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
-        this.idEmergencyContact = idEmergencyContact;
-        this.healthProfile = healthProfile;
-        this.name = name;
-        this.phone = phone;
-        this.relationship = relationship;
-        this.primaryContact = primaryContact;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getIdEmergencyContact() {
@@ -101,19 +89,19 @@ public class EmergencyContact {
         this.primaryContact = primaryContact;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

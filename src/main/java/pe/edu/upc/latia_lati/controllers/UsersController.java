@@ -8,41 +8,41 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import pe.edu.upc.latia_lati.entities.*;
-import pe.edu.upc.latia_lati.dtos.UserDTO;
+import pe.edu.upc.latia_lati.dtos.UsersDTO;
 import pe.edu.upc.latia_lati.exceptions.ResourceNotFoundException;
-import pe.edu.upc.latia_lati.serviceinterfaces.IUserService;
+import pe.edu.upc.latia_lati.serviceinterfaces.IUsersService;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
-    private final IUserService uS;
+public class UsersController {
+    private final IUsersService uS;
     private final ModelMapper modelMapper;
 
-    public UserController(IUserService uS, ModelMapper modelMapper) {
+    public UsersController(IUsersService uS, ModelMapper modelMapper) {
         this.uS = uS;
         this.modelMapper = modelMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> listar() {
+    public ResponseEntity<List<UsersDTO>> listar() {
 
-        List<UserDTO> lista = uS.list()
+        List<UsersDTO> lista = uS.list()
                 .stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
+                .map(user -> modelMapper.map(user, UsersDTO.class))
                 .toList();
 
         return ResponseEntity.ok(lista);
     }
     @PostMapping
-    public ResponseEntity<UserDTO> registrar(
-            @Valid @RequestBody UserDTO dto) {
+    public ResponseEntity<UsersDTO> registrar(
+            @Valid @RequestBody UsersDTO dto) {
 
-        User u = modelMapper.map(dto, User.class);
+        Users u = modelMapper.map(dto, Users.class);
 
         uS.insert(u);
 
-        UserDTO responseDTO =
-                modelMapper.map(u, UserDTO.class);
+        UsersDTO responseDTO =
+                modelMapper.map(u, UsersDTO.class);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -56,26 +56,26 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> buscarPorId(
+    public ResponseEntity<UsersDTO> buscarPorId(
             @PathVariable Long id) {
 
-        User user = uS.listId(id)
+        Users user = uS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe un usuario con el id: " + id
                         )
                 );
 
-        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        UsersDTO dto = modelMapper.map(user, UsersDTO.class);
 
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping
-    public ResponseEntity<UserDTO> actualizar(
-            @Valid @RequestBody UserDTO dto) {
+    public ResponseEntity<UsersDTO> actualizar(
+            @Valid @RequestBody UsersDTO dto) {
 
-        User u = uS.listId(dto.getIdUser())
+        Users u = uS.listId(dto.getIdUser())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe un usuario con el id: "
@@ -88,18 +88,17 @@ public class UserController {
         u.setEmail(dto.getEmail());
         u.setPasswordHash(dto.getPasswordHash());
         u.setActive(dto.getActive());
-        u.setPreferredTheme(dto.getPreferredTheme());
 
         uS.update(u);
 
-        UserDTO responseDTO =
-                modelMapper.map(u, UserDTO.class);
+        UsersDTO responseDTO =
+                modelMapper.map(u, UsersDTO.class);
 
         return ResponseEntity.ok(responseDTO);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        User u = uS.listId(id)
+        Users u = uS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe un usuario con el id: " + id

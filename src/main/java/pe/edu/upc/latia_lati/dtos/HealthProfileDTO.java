@@ -1,7 +1,6 @@
 package pe.edu.upc.latia_lati.dtos;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 import jakarta.validation.constraints.*;
 
@@ -37,10 +36,10 @@ public class HealthProfileDTO {
 
     @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
-    private OffsetDateTime createdAt;
+    private LocalDate createdAt;
 
     @PastOrPresent(message = "La fecha de actualización no puede ser futura")
-    private OffsetDateTime updatedAt;
+    private LocalDate updatedAt;
 
     public Long getIdHealthProfile() {
         return idHealthProfile;
@@ -122,19 +121,19 @@ public class HealthProfileDTO {
         this.active = active;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

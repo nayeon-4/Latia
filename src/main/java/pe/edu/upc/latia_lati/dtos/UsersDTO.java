@@ -1,16 +1,19 @@
 package pe.edu.upc.latia_lati.dtos;
 
-import java.time.OffsetDateTime;
-
 import jakarta.validation.constraints.*;
 
-public class UserDTO {
+import java.time.LocalDate;
+
+public class UsersDTO {
     private Long idUser;
     @NotBlank(message = "El nombre de usuario es obligatorio")
     private String firstName;
 
     @NotBlank(message = "El apellido del usuario es obligatorio")
     private String lastName;
+
+    @NotBlank(message = "El nombre de usuario es obligatorio")
+    private String username;
 
     @NotBlank(message = "El correo electrónico es obligatorio")
     @Email(message = "El correo electrónico debe tener un formato válido")
@@ -22,15 +25,12 @@ public class UserDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @NotBlank(message = "El tema preferido es obligatorio")
-    private String preferredTheme;
-
     @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
-    private OffsetDateTime createdAt;
+    private LocalDate createdAt;
 
     @PastOrPresent(message = "La fecha de actualización no puede ser futura")
-    private OffsetDateTime updatedAt;
+    private LocalDate updatedAt;
 
     public Long getIdUser() {
         return idUser;
@@ -54,6 +54,14 @@ public class UserDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -80,27 +88,19 @@ public class UserDTO {
         this.active = active;
     }
 
-    public String getPreferredTheme() {
-        return preferredTheme;
-    }
-
-    public void setPreferredTheme(String preferredTheme) {
-        this.preferredTheme = preferredTheme;
-    }
-
-    public OffsetDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
