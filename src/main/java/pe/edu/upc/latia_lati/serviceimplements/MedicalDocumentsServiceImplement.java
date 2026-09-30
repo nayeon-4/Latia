@@ -5,6 +5,7 @@ import pe.edu.upc.latia_lati.entities.MedicalDocuments;
 import pe.edu.upc.latia_lati.repositories.IMedicalDocumentsRepository;
 import pe.edu.upc.latia_lati.serviceinterfaces.IMedicalDocumentsService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +40,15 @@ public class MedicalDocumentsServiceImplement implements IMedicalDocumentsServic
     @Override
     public Optional<MedicalDocuments> listId(Long id) {
         return mDR.findById(id);
+    }
+
+    @Override
+    public List<MedicalDocuments> buscarDocumentosPorFecha(LocalDate documentDate) {
+        return mDR.findByDocumentDate(documentDate);
+    }
+
+    @Override
+    public List<MedicalDocuments> buscarDocumentosPorUsuario(Long userId) {
+        return mDR.buscarDocumentosPorUsuario(userId);
     }
 }

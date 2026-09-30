@@ -4,7 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pe.edu.upc.latia_lati.entities.Medications;
 
+import java.util.List;
+
 @Repository
 public interface IMedicationsRepository extends JpaRepository<Medications, Long> {
+    public List<Medications> findByNameMedications(String nameMedications);
+    public List<Medications> findByDosageForm(String dosageForm);
 
 }

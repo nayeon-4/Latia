@@ -41,4 +41,14 @@ public class MedicationsServiceImplement implements IMedicationsService {
     public Optional<Medications> listId(Long id) {
         return mR.findById(id);
     }
+
+    @Override
+    public List<Medications> obtenerPorNombre(String name) {
+        return mR.findByNameMedications(name);
+    }
+
+    @Override
+    public List<Medications> obtenerPorFormadeDosaje(String dosageForm) {
+        return mR.findByDosageForm(dosageForm);
+    }
 }

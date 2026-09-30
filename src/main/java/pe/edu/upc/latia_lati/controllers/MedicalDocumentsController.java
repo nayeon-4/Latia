@@ -13,6 +13,7 @@ import pe.edu.upc.latia_lati.serviceinterfaces.IHealthProfileService;
 import pe.edu.upc.latia_lati.serviceinterfaces.IMedicalDocumentsService;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,5 +128,21 @@ public class MedicalDocumentsController {
                 );
         mdS.delete(md.getIdMedicalDocuments());
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/fecha")
+    public ResponseEntity<List<MedicalDocumentsDTO>> obtenerPorFecha(@RequestParam("documentDate") LocalDate documentDate) {
+        List<MedicalDocumentsDTO> listad = mdS.buscarDocumentosPorFecha(documentDate)
+                .stream()
+                .map(medicalDocument -> modelMapper.map(medicalDocument, MedicalDocumentsDTO.class))
+                .toList();
+        return ResponseEntity.ok(listad);
+    }
+    @GetMapping("/doc-por-usuario")
+    public ResponseEntity<List<MedicalDocumentsDTO>> obtenerPorUsuario(@RequestParam("userId") Long userId) {
+        List<MedicalDocumentsDTO> listad = mdS.buscarDocumentosPorUsuario(userId)
+                .stream()
+                .map(medicalDocument -> modelMapper.map(medicalDocument, MedicalDocumentsDTO.class))
+                .toList();
+        return ResponseEntity.ok(listad);
     }
 }

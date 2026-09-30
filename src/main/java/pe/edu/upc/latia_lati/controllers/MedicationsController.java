@@ -23,6 +23,7 @@ public class MedicationsController {
         this.mS = mS;
         this.modelMapper = modelMapper;
     }
+
     @GetMapping
     public ResponseEntity<List<MedicationsDTO>> listar() {
         List<MedicationsDTO> lista = mS.list()
@@ -32,6 +33,7 @@ public class MedicationsController {
 
         return ResponseEntity.ok(lista);
     }
+
     @PostMapping
     public ResponseEntity<MedicationsDTO> registrar(
             @Valid @RequestBody MedicationsDTO dto) {
@@ -48,6 +50,7 @@ public class MedicationsController {
                 .created(location)
                 .body(responseDTO);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<MedicationsDTO> buscarPorId(
             @PathVariable Long id) {
@@ -56,6 +59,7 @@ public class MedicationsController {
         MedicationsDTO dto = modelMapper.map(m, MedicationsDTO.class);
         return ResponseEntity.ok(dto);
     }
+
     @PutMapping
     public ResponseEntity<MedicationsDTO> actualizar(
             @Valid @RequestBody MedicationsDTO dto) {
@@ -72,6 +76,7 @@ public class MedicationsController {
                 modelMapper.map(m, MedicationsDTO.class);
         return ResponseEntity.ok(responseDTO);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Medications m = mS.listId(id)
@@ -82,5 +87,23 @@ public class MedicationsController {
                 );
         mS.delete(m.getIdMedications());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/name")
+    public ResponseEntity<List<MedicationsDTO>> obtenerPorNombre(@RequestParam("name") String name) {
+        List<MedicationsDTO> lista = mS.obtenerPorNombre(name)
+                .stream()
+                .map(medication -> modelMapper.map(medication, MedicationsDTO.class))
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/dosageForm")
+    public ResponseEntity<List<MedicationsDTO>> obtenerPorFormadeDosaje(@RequestParam("dosageForm") String dosageForm) {
+        List<MedicationsDTO> listad = mS.obtenerPorFormadeDosaje(dosageForm)
+                .stream()
+                .map(medication -> modelMapper.map(medication, MedicationsDTO.class))
+                .toList();
+        return ResponseEntity.ok(listad);
     }
 }

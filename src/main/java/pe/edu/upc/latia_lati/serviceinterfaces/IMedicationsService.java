@@ -11,4 +11,6 @@ public interface IMedicationsService {
     public void update(Medications medications);
     public void delete(Long id);
     public Optional<Medications> listId(Long id);
+    public List<Medications> obtenerPorNombre(String name);
+    public List<Medications> obtenerPorFormadeDosaje(String dosageForm);
 }
