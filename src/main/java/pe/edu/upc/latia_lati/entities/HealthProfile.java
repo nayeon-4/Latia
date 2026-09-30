@@ -64,7 +64,7 @@ public class HealthProfile {
 
     @JsonIgnore
     @OneToMany(mappedBy = "healthProfile")
-    private List<MedicalDocument> medicalDocuments;
+    private List<MedicalDocuments> medicalDocuments;
 
     public HealthProfile() {
 
