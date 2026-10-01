@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import pe.edu.upc.latia_lati.entities.*;
+import pe.edu.upc.latia_lati.dtos.EmergencyCardDTO;
 import pe.edu.upc.latia_lati.dtos.EmergencyContactDTO;
 import pe.edu.upc.latia_lati.exceptions.ResourceNotFoundException;
 import pe.edu.upc.latia_lati.serviceinterfaces.IEmergencyContactService;
@@ -61,8 +63,7 @@ public class EmergencyContactController {
         // 2. Convertir DTO a entidad
         EmergencyContact ec = modelMapper.map(dto, EmergencyContact.class);
 
-        // 3. El id lo genera la base de datos; si llega en el body se ignora
-        //    para no sobrescribir un contacto existente
+        // 3. El id lo genera la base de datos; si llega en el body se ignora para no sobrescribir un contacto existente
         ec.setIdEmergencyContact(null);
         ec.setHealthProfile(hp);
 
@@ -146,8 +147,39 @@ public class EmergencyContactController {
         return ResponseEntity.noContent().build();
     }
 
-    // ModelMapper está en modo STRICT y no llena idHealthProfile
-    // a partir de healthProfile.idHealthProfile, por eso se asigna a mano
+    // HU68: Listar contactos de emergencia principales (reporte simple)
+    @GetMapping("/principales")
+    public ResponseEntity<List<EmergencyContactDTO>> listarPrincipales() {
+
+        // Si no hay coincidencias se devuelve la lista vacía
+        List<EmergencyContactDTO> lista = ecS.listarPrincipales()
+                .stream()
+                .map(ec -> convertirDTO(ec))
+                .toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+    // HU69: Ficha de emergencia por perfil de salud (reporte con JOIN)
+    @GetMapping("/fichas")
+    public ResponseEntity<List<EmergencyCardDTO>> fichaEmergencia() {
+
+        List<EmergencyCardDTO> lista = new ArrayList<>();
+
+        for (Object[] item : ecS.fichaEmergencia()) {
+            EmergencyCardDTO dto = new EmergencyCardDTO();
+            dto.setIdHealthProfile(((Number) item[0]).longValue());
+            dto.setPatientName((String) item[1] + " " + (String) item[2]);
+            dto.setBloodType((String) item[3]);
+            dto.setContactName((String) item[4]);
+            dto.setContactPhone((String) item[5]);
+            dto.setRelationship((String) item[6]);
+            lista.add(dto);
+        }
+
+        return ResponseEntity.ok(lista);
+    }
+
     private EmergencyContactDTO convertirDTO(EmergencyContact ec) {
         EmergencyContactDTO dto = modelMapper.map(ec, EmergencyContactDTO.class);
         dto.setIdHealthProfile(ec.getHealthProfile().getIdHealthProfile());

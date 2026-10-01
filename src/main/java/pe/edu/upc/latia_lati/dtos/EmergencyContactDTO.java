@@ -25,7 +25,7 @@ public class EmergencyContactDTO {
     private Boolean primaryContact;
 
     // Las fechas las genera la base de datos (@CreationTimestamp / @UpdateTimestamp),
-    // por eso no se validan: solo se devuelven en la respuesta.
+    // por eso no se validan, solo devuelve la respuesta.
     private OffsetDateTime createdAt;
 
     private OffsetDateTime updatedAt;
