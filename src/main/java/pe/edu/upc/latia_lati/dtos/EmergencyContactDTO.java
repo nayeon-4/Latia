@@ -6,25 +6,28 @@ import jakarta.validation.constraints.*;
 public class EmergencyContactDTO {
     private Long idEmergencyContact;
 
+    @NotNull(message = "El id del perfil de salud es obligatorio")
     private Long idHealthProfile;
 
     @NotBlank(message = "El nombre del contacto de emergencia es obligatorio")
+    @Size(max = 150, message = "El nombre no puede superar los 150 caracteres")
     private String name;
 
     @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "El teléfono debe tener entre 7 y 15 dígitos y puede iniciar con +")
     private String phone;
 
     @NotBlank(message = "El parentesco es obligatorio")
+    @Size(max = 80, message = "El parentesco no puede superar los 80 caracteres")
     private String relationship;
 
     @NotNull(message = "Debe indicar si es el contacto principal")
     private Boolean primaryContact;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
-    @PastOrPresent(message = "La fecha de creación no puede ser futura")
+    // Las fechas las genera la base de datos (@CreationTimestamp / @UpdateTimestamp),
+    // por eso no se validan: solo se devuelven en la respuesta.
     private OffsetDateTime createdAt;
 
-    @PastOrPresent(message = "La fecha de actualización no puede ser futura")
     private OffsetDateTime updatedAt;
 
     public Long getIdEmergencyContact() {

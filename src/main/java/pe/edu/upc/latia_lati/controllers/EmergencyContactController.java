@@ -27,36 +27,49 @@ public class EmergencyContactController {
         this.modelMapper = modelMapper;
     }
 
+    // HU12: Listar contactos de emergencia
     @GetMapping
     public ResponseEntity<List<EmergencyContactDTO>> listar() {
 
-        List<EmergencyContactDTO> lista = ecS.list()
+        List<EmergencyContact> contactos = ecS.list();
+
+        // CA03: informar el error cuando no existan registros
+        if (contactos.isEmpty()) {
+            throw new ResourceNotFoundException("No existen contactos de emergencia registrados");
+        }
+
+        List<EmergencyContactDTO> lista = contactos
                 .stream()
-                .map(ec -> modelMapper.map(ec, EmergencyContactDTO.class))
+                .map(ec -> convertirDTO(ec))
                 .toList();
 
         return ResponseEntity.ok(lista);
     }
 
+    // HU11: Crear contacto de emergencia
     @PostMapping
     public ResponseEntity<EmergencyContactDTO> registrar(
             @Valid @RequestBody EmergencyContactDTO dto) {
 
+        // 1. Verificar que el perfil de salud exista
         HealthProfile hp = hpS.listId(dto.getIdHealthProfile())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe un perfil de salud con el id: " + dto.getIdHealthProfile()
                         ));
 
-        EmergencyContact ec =
-                modelMapper.map(dto, EmergencyContact.class);
+        // 2. Convertir DTO a entidad
+        EmergencyContact ec = modelMapper.map(dto, EmergencyContact.class);
 
+        // 3. El id lo genera la base de datos; si llega en el body se ignora
+        //    para no sobrescribir un contacto existente
+        ec.setIdEmergencyContact(null);
         ec.setHealthProfile(hp);
 
+        // 4. Guardar
         ecS.insert(ec);
 
-        EmergencyContactDTO responseDTO =
-                modelMapper.map(ec, EmergencyContactDTO.class);
+        EmergencyContactDTO responseDTO = convertirDTO(ec);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -69,6 +82,7 @@ public class EmergencyContactController {
                 .body(responseDTO);
     }
 
+    // HU13: Encontrar contacto de emergencia por Id
     @GetMapping("/{id}")
     public ResponseEntity<EmergencyContactDTO> buscarPorId(
             @PathVariable Long id) {
@@ -79,45 +93,48 @@ public class EmergencyContactController {
                                 "No existe un contacto de emergencia con el id: " + id
                         ));
 
-        EmergencyContactDTO dto = modelMapper.map(ec, EmergencyContactDTO.class);
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(convertirDTO(ec));
     }
 
-    @PutMapping
+    // HU14: Actualizar contacto de emergencia por Id
+    @PutMapping("/{id}")
     public ResponseEntity<EmergencyContactDTO> actualizar(
+            @PathVariable Long id,
             @Valid @RequestBody EmergencyContactDTO dto) {
 
-        EmergencyContact ec = ecS.listId(dto.getIdEmergencyContact())
+        // 1. Verificar que el contacto exista
+        EmergencyContact ec = ecS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "No existe un contacto de emergencia con el id: " + dto.getIdEmergencyContact()
+                                "No existe un contacto de emergencia con el id: " + id
                         ));
 
+        // 2. Verificar que el perfil de salud exista
         HealthProfile hp = hpS.listId(dto.getIdHealthProfile())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe un perfil de salud con el id: " + dto.getIdHealthProfile()
                         ));
 
+        // 3. Copiar los datos editables (createdAt no se toca)
         ec.setHealthProfile(hp);
         ec.setName(dto.getName());
         ec.setPhone(dto.getPhone());
         ec.setRelationship(dto.getRelationship());
         ec.setPrimaryContact(dto.getPrimaryContact());
 
+        // 4. Guardar
         ecS.update(ec);
 
-        EmergencyContactDTO responseDTO =
-                modelMapper.map(ec, EmergencyContactDTO.class);
-
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(convertirDTO(ec));
     }
 
+    // HU15: Borrar contacto de emergencia por Id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
             @PathVariable Long id) {
 
+        // CA02: verificar que el contacto exista antes de eliminarlo
         EmergencyContact ec = ecS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -127,5 +144,13 @@ public class EmergencyContactController {
         ecS.delete(ec.getIdEmergencyContact());
 
         return ResponseEntity.noContent().build();
+    }
+
+    // ModelMapper está en modo STRICT y no llena idHealthProfile
+    // a partir de healthProfile.idHealthProfile, por eso se asigna a mano
+    private EmergencyContactDTO convertirDTO(EmergencyContact ec) {
+        EmergencyContactDTO dto = modelMapper.map(ec, EmergencyContactDTO.class);
+        dto.setIdHealthProfile(ec.getHealthProfile().getIdHealthProfile());
+        return dto;
     }
 }
