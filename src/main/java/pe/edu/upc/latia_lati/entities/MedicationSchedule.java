@@ -12,13 +12,13 @@ public class MedicationSchedule {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "treatment_id", nullable = false)
+    @JoinColumn(name = "idMedicamentTreatment", nullable = false)
     private MedicationTreatment treatment;
 
-    @Column(name = "reminder_time", nullable = false)
+    @Column(name = "reminderTime", nullable = false)
     private LocalDateTime reminderTime;
 
-    @Column(name = "interval_hours", nullable = false)
+    @Column(name = "intervalHours", nullable = false)
     private Integer intervalHours;
 
     public MedicationSchedule() {

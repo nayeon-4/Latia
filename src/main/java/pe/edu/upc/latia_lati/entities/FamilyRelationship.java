@@ -11,14 +11,14 @@ public class FamilyRelationship {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "origin_profile_id", nullable = false)
+    @JoinColumn(name = "idOriginProfile", nullable = false)
     private HealthProfile originProfile;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "relative_profile_id", nullable = false)
+    @JoinColumn(name = "idRelativeProfile", nullable = false)
     private HealthProfile relativeProfile;
 
-    @Column(name = "relationship_type", nullable = false, length = 80)
+    @Column(name = "relationshipType", nullable = false, length = 80)
     private String relationshipType;
 
     public FamilyRelationship() {

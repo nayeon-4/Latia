@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.latia_lati.dtos.HealthProfileDTO;
 import pe.edu.upc.latia_lati.entities.HealthProfile;
-import pe.edu.upc.latia_lati.entities.User;
+import pe.edu.upc.latia_lati.entities.Users;
 import pe.edu.upc.latia_lati.exceptions.ResourceNotFoundException;
 import pe.edu.upc.latia_lati.serviceinterfaces.IHealthProfileService;
-import pe.edu.upc.latia_lati.serviceinterfaces.IUserService;
+import pe.edu.upc.latia_lati.serviceinterfaces.IUsersService;
 
 import java.net.URI;
 import java.util.List;
@@ -21,10 +21,10 @@ import java.util.Optional;
 public class HealthProfileController {
 
     private final IHealthProfileService hpS;
-    private final IUserService uS;
+    private final IUsersService uS;
     private final ModelMapper modelMapper;
 
-    public HealthProfileController(IHealthProfileService hpS, IUserService uS, ModelMapper modelMapper) {
+    public HealthProfileController(IHealthProfileService hpS, IUsersService uS, ModelMapper modelMapper) {
         this.hpS = hpS;
         this.uS = uS;
         this.modelMapper = modelMapper;
@@ -51,7 +51,7 @@ public class HealthProfileController {
             @Valid @RequestBody HealthProfileDTO dto) {
 
         // 1. Verificar que el usuario propietario exista
-        Optional<User> owner = uS.listId(dto.getIdOwnerUser());
+        Optional<Users> owner = uS.listId(dto.getIdOwnerUser());
 
         if (owner.isEmpty()) {
             throw new ResourceNotFoundException(
@@ -61,10 +61,10 @@ public class HealthProfileController {
         }
 
         // 2. Verificar el usuario titular si fue enviado
-        User holder = null;
+        Users holder = null;
 
         if (dto.getIdHolderUser() != null) {
-            Optional<User> holderOptional =
+            Optional<Users> holderOptional =
                     uS.listId(dto.getIdHolderUser());
 
             if (holderOptional.isEmpty()) {
@@ -135,7 +135,7 @@ public class HealthProfileController {
         }
 
         // 2. Verificar que el usuario propietario exista
-        Optional<User> owner =
+        Optional<Users> owner =
                 uS.listId(dto.getIdOwnerUser());
 
         if (owner.isEmpty()) {
@@ -145,10 +145,10 @@ public class HealthProfileController {
         }
 
         // 3. Verificar el usuario titular si fue enviado
-        User holder = null;
+        Users holder = null;
 
         if (dto.getIdHolderUser() != null) {
-            Optional<User> holderOptional =
+            Optional<Users> holderOptional =
                     uS.listId(dto.getIdHolderUser());
 
             if (holderOptional.isEmpty()) {
@@ -164,8 +164,6 @@ public class HealthProfileController {
         HealthProfile hp = existente.get();
 
         // 5. Actualizar sus campos
-        hp.setFirstName(dto.getFirstName());
-        hp.setLastName(dto.getLastName());
         hp.setBirthDate(dto.getBirthDate());
         hp.setSex(dto.getSex());
         hp.setBloodType(dto.getBloodType());

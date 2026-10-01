@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -16,7 +15,7 @@ public class EmergencyContact {
     private Long idEmergencyContact;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "health_profile_id", nullable = false)
+    @JoinColumn(name = "idHealthProfile", nullable = false)
     private HealthProfile healthProfile;
 
     @Column(name = "name", nullable = false, length = 150)
