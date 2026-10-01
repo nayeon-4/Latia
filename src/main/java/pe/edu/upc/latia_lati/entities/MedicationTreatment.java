@@ -19,7 +19,7 @@ public class MedicationTreatment {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "medication_id", nullable = false)
-    private Medication medication;
+    private Medications medication;
 
     @Column(name = "dose", nullable = false, length = 100)
     private String dose;
@@ -40,7 +40,7 @@ public class MedicationTreatment {
     public MedicationTreatment() {
     }
 
-    public MedicationTreatment(Long id, ClinicalRecord clinicalRecord, Medication medication, String dose,
+    public MedicationTreatment(Long id, ClinicalRecord clinicalRecord, Medications medication, String dose,
                                String administrationRoute, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.clinicalRecord = clinicalRecord;
@@ -55,8 +55,8 @@ public class MedicationTreatment {
     public void setId(Long id) { this.id = id; }
     public ClinicalRecord getClinicalRecord() { return clinicalRecord; }
     public void setClinicalRecord(ClinicalRecord clinicalRecord) { this.clinicalRecord = clinicalRecord; }
-    public Medication getMedication() { return medication; }
-    public void setMedication(Medication medication) { this.medication = medication; }
+    public Medications getMedication() { return medication; }
+    public void setMedication(Medications medication) { this.medication = medication; }
     public String getDose() { return dose; }
     public void setDose(String dose) { this.dose = dose; }
     public String getAdministrationRoute() { return administrationRoute; }
