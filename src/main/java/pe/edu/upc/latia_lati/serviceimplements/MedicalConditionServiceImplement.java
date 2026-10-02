@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MedicalConditionImplement implements IMedicalConditionService {
+public class MedicalConditionServiceImplement implements IMedicalConditionService {
     private final IMedicalConditionRepository mcR;
 
-    public MedicalConditionImplement(IMedicalConditionRepository mcR) {
+    public MedicalConditionServiceImplement(IMedicalConditionRepository mcR) {
         this.mcR = mcR;
     }
 
@@ -36,7 +36,8 @@ public class MedicalConditionImplement implements IMedicalConditionService {
         mcR.deleteById(idMedicalCondition);
     }
 
-    @Override    public Optional<MedicalCondition> listId(Long id) {
+    @Override
+    public Optional<MedicalCondition> listId(Long id) {
         return mcR.findById(id);
     }
 }

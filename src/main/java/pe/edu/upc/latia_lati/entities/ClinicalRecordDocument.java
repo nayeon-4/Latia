@@ -11,17 +11,17 @@ public class ClinicalRecordDocument {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "clinical_record_id", nullable = false)
+    @JoinColumn(name = "idClinicalRecord", nullable = false)
     private ClinicalRecord clinicalRecord;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "medical_document_id", nullable = false)
-    private MedicalDocument medicalDocument;
+    @JoinColumn(name = "idMedicalDocument", nullable = false)
+    private MedicalDocuments medicalDocument;
 
     public ClinicalRecordDocument() {
     }
 
-    public ClinicalRecordDocument(Long id, ClinicalRecord clinicalRecord, MedicalDocument medicalDocument) {
+    public ClinicalRecordDocument(Long id, ClinicalRecord clinicalRecord, MedicalDocuments medicalDocument) {
         this.id = id;
         this.clinicalRecord = clinicalRecord;
         this.medicalDocument = medicalDocument;
@@ -31,6 +31,6 @@ public class ClinicalRecordDocument {
     public void setId(Long id) { this.id = id; }
     public ClinicalRecord getClinicalRecord() { return clinicalRecord; }
     public void setClinicalRecord(ClinicalRecord clinicalRecord) { this.clinicalRecord = clinicalRecord; }
-    public MedicalDocument getMedicalDocument() { return medicalDocument; }
-    public void setMedicalDocument(MedicalDocument medicalDocument) { this.medicalDocument = medicalDocument; }
+    public MedicalDocuments getMedicalDocument() { return medicalDocument; }
+    public void setMedicalDocument(MedicalDocuments medicalDocument) { this.medicalDocument = medicalDocument; }
 }

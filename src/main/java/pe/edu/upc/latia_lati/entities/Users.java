@@ -4,57 +4,59 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username")
+        }
+)
+public class Users implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long idUser;
 
-    @Column(name = "first_name", nullable = false, length = 100)
+    @Column(name = "firstName", nullable = false, length = 100)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 100)
+    @Column(name = "lastName", nullable = false, length = 100)
     private String lastName;
+
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
     @Column(name = "email", nullable = false, length = 150, unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "passwordHash", nullable = false, length = 255)
     private String passwordHash;
 
     @Column(name = "active", nullable = false)
-    private Boolean active;
-
-    @Column(name = "preferredTheme", nullable = false, length = 20)
-    private String preferredTheme;
+    private Boolean active = true;
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private LocalDate createdAt;
 
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = false)
-    private OffsetDateTime updatedAt;
+    private LocalDate updatedAt;
 
-    public User() {
+    @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Role> roles = new ArrayList<>();
 
-    }
+    public Users() {
 
-    public User(Long idUser, String firstName, String lastName, String email, String passwordHash, Boolean active, String preferredTheme, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
-        this.idUser = idUser;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.active = active;
-        this.preferredTheme = preferredTheme;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getIdUser() {
@@ -81,6 +83,14 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -105,27 +115,27 @@ public class User {
         this.active = active;
     }
 
-    public String getPreferredTheme() {
-        return preferredTheme;
-    }
-
-    public void setPreferredTheme(String preferredTheme) {
-        this.preferredTheme = preferredTheme;
-    }
-
-    public OffsetDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

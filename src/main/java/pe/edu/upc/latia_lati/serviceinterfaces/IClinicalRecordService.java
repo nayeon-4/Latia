@@ -11,4 +11,6 @@ public interface IClinicalRecordService {
     public void update(ClinicalRecord clinicalRecord);
     public void delete(Long idClinicalRecord);
     public Optional<ClinicalRecord> listId(Long id);
+    public List<ClinicalRecord> obtenerPorTipo(String tipo);
+    public List<Object[]> cantidadPorCondicionMedica();
 }

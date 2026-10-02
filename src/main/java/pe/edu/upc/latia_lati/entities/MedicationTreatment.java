@@ -14,23 +14,23 @@ public class MedicationTreatment {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "clinical_record_id", nullable = false)
+    @JoinColumn(name = "idClinicalRecord", nullable = false)
     private ClinicalRecord clinicalRecord;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "medication_id", nullable = false)
-    private Medication medication;
+    @JoinColumn(name = "idMedication", nullable = false)
+    private Medications medication;
 
     @Column(name = "dose", nullable = false, length = 100)
     private String dose;
 
-    @Column(name = "administration_route", nullable = false, length = 80)
+    @Column(name = "administrationRoute", nullable = false, length = 80)
     private String administrationRoute;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "startDate", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "endDate")
     private LocalDate endDate;
 
     @JsonIgnore
@@ -40,7 +40,7 @@ public class MedicationTreatment {
     public MedicationTreatment() {
     }
 
-    public MedicationTreatment(Long id, ClinicalRecord clinicalRecord, Medication medication, String dose,
+    public MedicationTreatment(Long id, ClinicalRecord clinicalRecord, Medications medication, String dose,
                                String administrationRoute, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.clinicalRecord = clinicalRecord;
@@ -55,8 +55,8 @@ public class MedicationTreatment {
     public void setId(Long id) { this.id = id; }
     public ClinicalRecord getClinicalRecord() { return clinicalRecord; }
     public void setClinicalRecord(ClinicalRecord clinicalRecord) { this.clinicalRecord = clinicalRecord; }
-    public Medication getMedication() { return medication; }
-    public void setMedication(Medication medication) { this.medication = medication; }
+    public Medications getMedication() { return medication; }
+    public void setMedication(Medications medication) { this.medication = medication; }
     public String getDose() { return dose; }
     public void setDose(String dose) { this.dose = dose; }
     public String getAdministrationRoute() { return administrationRoute; }
