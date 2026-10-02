@@ -41,4 +41,14 @@ public class EmergencyContactServiceImplement implements IEmergencyContactServic
     public Optional<EmergencyContact> listId(Long id) {
         return ecR.findById(id);
     }
+
+    @Override
+    public List<EmergencyContact> listarPrincipales() {
+        return ecR.findByPrimaryContactTrue();
+    }
+
+    @Override
+    public List<Object[]> fichaEmergencia() {
+        return ecR.getEmergencyCards();
+    }
 }

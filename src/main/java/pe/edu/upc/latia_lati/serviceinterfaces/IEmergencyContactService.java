@@ -11,4 +11,6 @@ public interface IEmergencyContactService {
     public void update(EmergencyContact emergencyContact);
     public void delete(Long idEmergencyContact);
     public Optional<EmergencyContact> listId(Long id);
+    public List<EmergencyContact> listarPrincipales();
+    public List<Object[]> fichaEmergencia();
 }
