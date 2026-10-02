@@ -4,13 +4,16 @@ import java.time.OffsetDateTime;
 
 import jakarta.validation.constraints.*;
 
-public class UserDTO {
+public class UsersRequestDTO {
     private Long idUser;
     @NotBlank(message = "El nombre de usuario es obligatorio")
     private String firstName;
 
     @NotBlank(message = "El apellido del usuario es obligatorio")
     private String lastName;
+
+    @NotBlank(message = "El nombre de usuario es obligatorio")
+    private String username;
 
     @NotBlank(message = "El correo electrónico es obligatorio")
     @Email(message = "El correo electrónico debe tener un formato válido")
@@ -22,10 +25,6 @@ public class UserDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @NotBlank(message = "El tema preferido es obligatorio")
-    private String preferredTheme;
-
-    @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private OffsetDateTime createdAt;
 
@@ -56,6 +55,14 @@ public class UserDTO {
         this.lastName = lastName;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -78,14 +85,6 @@ public class UserDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public String getPreferredTheme() {
-        return preferredTheme;
-    }
-
-    public void setPreferredTheme(String preferredTheme) {
-        this.preferredTheme = preferredTheme;
     }
 
     public OffsetDateTime getCreatedAt() {

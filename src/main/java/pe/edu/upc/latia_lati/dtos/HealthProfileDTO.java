@@ -9,15 +9,11 @@ import jakarta.validation.constraints.*;
 public class HealthProfileDTO {
     private Long idHealthProfile;
 
+    @NotNull(message = "El ID del usuario propietario es obligatorio")
+    @Positive(message = "El ID del usuario propietario debe ser positivo")
     private Long idOwnerUser;
 
     private Long idHolderUser;
-
-    @NotBlank(message = "El nombre es obligatorio")
-    private String firstName;
-
-    @NotBlank(message = "El apellido es obligatorio")
-    private String lastName;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     @PastOrPresent(message = "La fecha de nacimiento no puede ser futura")
@@ -35,7 +31,6 @@ public class HealthProfileDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private OffsetDateTime createdAt;
 
@@ -64,22 +59,6 @@ public class HealthProfileDTO {
 
     public void setIdHolderUser(Long idHolderUser) {
         this.idHolderUser = idHolderUser;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public LocalDate getBirthDate() {
