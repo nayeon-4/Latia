@@ -21,6 +21,13 @@ import java.util.List;
 public class DemoDataInitializer implements CommandLineRunner {
     private static final String DEMO_USERNAME_PREFIX = "latia.ficticio.";
     private static final String LEGACY_DEMO_USERNAME_PREFIX = "demo.latia.";
+    private static final List<String> DEMO_USERNAMES = List.of(
+            "valeria.quiroz",
+            "mateo.quiroz",
+            "camila.rojas",
+            "diego.rojas",
+            "rosa.quiroz"
+    );
 
     private final IUsersRepository usersRepository;
     private final IHealthProfileRepository healthProfileRepository;
@@ -68,8 +75,9 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        syncUserSequenceIfNeeded();
         removePreviousDemoData();
-        if (usersRepository.findByUsername(DEMO_USERNAME_PREFIX + "01").isPresent()) {
+        if (DEMO_USERNAMES.stream().anyMatch(username -> usersRepository.findByUsername(username).isPresent())) {
             return;
         }
 
@@ -105,10 +113,21 @@ public class DemoDataInitializer implements CommandLineRunner {
         createClinicalRecordDocuments(clinicalRecords, documents);
     }
 
+    private void syncUserSequenceIfNeeded() {
+        if (usersRepository.count() > 0) {
+            usersRepository.syncIdSequence();
+        }
+    }
+
     private void removePreviousDemoData() {
         List<Users> previousDemoUsers = new ArrayList<>();
+        for (String username : DEMO_USERNAMES) {
+            usersRepository.findByUsername(username).ifPresent(previousDemoUsers::add);
+        }
         for (int i = 1; i <= 5; i++) {
             usersRepository.findByUsername(LEGACY_DEMO_USERNAME_PREFIX + String.format("%02d", i))
+                    .ifPresent(previousDemoUsers::add);
+            usersRepository.findByUsername(DEMO_USERNAME_PREFIX + String.format("%02d", i))
                     .ifPresent(previousDemoUsers::add);
         }
         if (previousDemoUsers.isEmpty()) {
@@ -181,7 +200,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             Users user = new Users();
             user.setFirstName(firstNames[i - 1]);
             user.setLastName(lastNames[i - 1]);
-            user.setUsername(DEMO_USERNAME_PREFIX + String.format("%02d", i));
+            user.setUsername(DEMO_USERNAMES.get(i - 1));
             user.setEmail(firstNames[i - 1].toLowerCase() + "." + lastNames[i - 1].toLowerCase()
                     + "@example.com");
             user.setPasswordHash(passwordEncoder.encode("LatiaDemo2026!"));
@@ -206,8 +225,8 @@ public class DemoDataInitializer implements CommandLineRunner {
                 LocalDate.of(1964, 9, 9)
         };
         String[] bloodTypes = {"O+", "A-", "B+", "O-", "AB+"};
-        String[] phones = {"+51 900 000 001", "+51 900 000 002", "+51 900 000 003",
-                "+51 900 000 004", "+51 900 000 005"};
+        String[] phones = {"+51 923 822 101", "+51 959 991 097", "+51 989 325 881",
+                "+51 902 242 569", "+51 935 183 025"};
         String[] sexes = {"Femenino", "Masculino", "Femenino", "Masculino", "Femenino"};
         for (int i = 0; i < users.size(); i++) {
             HealthProfile profile = new HealthProfile();
@@ -265,8 +284,8 @@ public class DemoDataInitializer implements CommandLineRunner {
 
     private void createEmergencyContacts(List<HealthProfile> profiles) {
         String[] names = {"Mateo Quiroz", "Valeria Quiroz", "Diego Rojas", "Camila Rojas", "Lucia Quiroz"};
-        String[] phones = {"+51 900 000 101", "+51 900 000 102", "+51 900 000 103",
-                "+51 900 000 104", "+51 900 000 105"};
+        String[] phones = {"+51 923 822 101", "+51 959 991 097", "+51 989 325 881",
+                "+51 902 242 569", "+51 935 183 025"};
         String[] relationships = {"Hermano", "Hermana", "Esposo", "Esposa", "Hija"};
         List<EmergencyContact> contacts = new ArrayList<>();
         for (int i = 0; i < profiles.size(); i++) {
