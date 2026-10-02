@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 public class EmergencyContactDTO {
     private Long idEmergencyContact;
 
+    @NotNull(message = "El ID del perfil de salud es obligatorio")
+    @Positive(message = "El ID del perfil de salud debe ser positivo")
     private Long idHealthProfile;
 
     @NotBlank(message = "El nombre del contacto de emergencia es obligatorio")
@@ -20,7 +22,6 @@ public class EmergencyContactDTO {
     @NotNull(message = "Debe indicar si es el contacto principal")
     private Boolean primaryContact;
 
-    @NotNull(message = "La fecha de creación es obligatoria")
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private OffsetDateTime createdAt;
 

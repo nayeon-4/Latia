@@ -11,11 +11,11 @@ public class ClinicalRecordDocument {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "clinical_record_id", nullable = false)
+    @JoinColumn(name = "idClinicalRecord", nullable = false)
     private ClinicalRecord clinicalRecord;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "medical_document_id", nullable = false)
+    @JoinColumn(name = "idMedicalDocument", nullable = false)
     private MedicalDocuments medicalDocument;
 
     public ClinicalRecordDocument() {

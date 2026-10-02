@@ -14,23 +14,23 @@ public class MedicationTreatment {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "clinical_record_id", nullable = false)
+    @JoinColumn(name = "idClinicalRecord", nullable = false)
     private ClinicalRecord clinicalRecord;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "medication_id", nullable = false)
+    @JoinColumn(name = "idMedication", nullable = false)
     private Medications medication;
 
     @Column(name = "dose", nullable = false, length = 100)
     private String dose;
 
-    @Column(name = "administration_route", nullable = false, length = 80)
+    @Column(name = "administrationRoute", nullable = false, length = 80)
     private String administrationRoute;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "startDate", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "endDate")
     private LocalDate endDate;
 
     @JsonIgnore

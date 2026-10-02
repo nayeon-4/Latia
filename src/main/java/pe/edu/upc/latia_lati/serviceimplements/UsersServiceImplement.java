@@ -6,30 +6,29 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.latia_lati.entities.*;
 import pe.edu.upc.latia_lati.repositories.*;
-import pe.edu.upc.latia_lati.exceptions.*;
-import pe.edu.upc.latia_lati.serviceinterfaces.IUserService;
+import pe.edu.upc.latia_lati.serviceinterfaces.IUsersService;
 
 @Service
-public class UserServiceImplement implements IUserService {
-    private final IUserRepository uR;
+public class UsersServiceImplement implements IUsersService {
+    private final IUsersRepository uR;
 
 
-    public UserServiceImplement(IUserRepository uR) {
+    public UsersServiceImplement(IUsersRepository uR) {
         this.uR = uR;
     }
 
     @Override
-    public void insert(User user) {
+    public void insert(Users user) {
         uR.save(user);
     }
 
     @Override
-    public List<User> list() {
+    public List<Users> list() {
         return uR.findAll();
     }
 
     @Override
-    public void update(User user) {
+    public void update(Users user) {
         uR.save(user);
     }
 
@@ -39,7 +38,7 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public Optional<User> listId(Long id) {
+    public Optional<Users> listId(Long id) {
         return uR.findById(id);
     }
 }

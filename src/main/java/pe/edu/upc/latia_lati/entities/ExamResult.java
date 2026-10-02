@@ -11,13 +11,13 @@ public class ExamResult {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "clinical_record_id", nullable = false)
+    @JoinColumn(name = "idClinicalRecord", nullable = false)
     private ClinicalRecord clinicalRecord;
 
-    @Column(name = "parameter_name", nullable = false, length = 150)
+    @Column(name = "parameterName", nullable = false, length = 150)
     private String parameterName;
 
-    @Column(name = "result_value", nullable = false, length = 150)
+    @Column(name = "resultValue", nullable = false, length = 150)
     private String resultValue;
 
     @Column(name = "unit", length = 50)

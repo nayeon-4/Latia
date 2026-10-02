@@ -14,30 +14,23 @@ import java.util.List;
 public class HealthProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long idHealthProfile;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "owner_user_id", nullable = false)
-    private User ownerUser;
+    @JoinColumn(name = "idOwnerUser", nullable = false)
+    private Users ownerUser;
 
     @OneToOne(optional = true)
-    @JoinColumn(name = "holder_user_id", nullable = true, unique = true)
-    private User holderUser;
+    @JoinColumn(name = "idHolderUser", nullable = true, unique = true)
+    private Users holderUser;
 
-    @Column(name = "first_name", nullable = false, length = 100)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false, length = 100)
-    private String lastName;
-
-    @Column(name = "birth_date", nullable = true)
+    @Column(name = "birthDate", nullable = true)
     private LocalDate birthDate;
 
     @Column(name = "sex", nullable = true, length = 30)
     private String sex;
 
-    @Column(name = "blood_type", nullable = true, length = 5)
+    @Column(name = "bloodType", nullable = true, length = 5)
     private String bloodType;
 
     @Column(name = "phone", nullable = true, length = 30)
@@ -54,28 +47,14 @@ public class HealthProfile {
     @Column(name = "updatedAt", nullable = true)
     private OffsetDateTime updatedAt;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "originProfile")
-    private List<FamilyRelationship> familyRelationships;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "relativeProfile")
-    private List<FamilyRelationship> relatedToProfiles;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "healthProfile")
-    private List<MedicalDocuments> medicalDocuments;
-
     public HealthProfile() {
 
     }
 
-    public HealthProfile(Long idHealthProfile, User ownerUser, User holderUser, String firstName, String lastName, LocalDate birthDate, String sex, String bloodType, String phone, Boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public HealthProfile(Long idHealthProfile, Users ownerUser, Users holderUser, LocalDate birthDate, String sex, String bloodType, String phone, Boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.idHealthProfile = idHealthProfile;
         this.ownerUser = ownerUser;
         this.holderUser = holderUser;
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.birthDate = birthDate;
         this.sex = sex;
         this.bloodType = bloodType;
@@ -93,36 +72,20 @@ public class HealthProfile {
         this.idHealthProfile = idHealthProfile;
     }
 
-    public User getOwnerUser() {
+    public Users getOwnerUser() {
         return ownerUser;
     }
 
-    public void setOwnerUser(User ownerUser) {
+    public void setOwnerUser(Users ownerUser) {
         this.ownerUser = ownerUser;
     }
 
-    public User getHolderUser() {
+    public Users getHolderUser() {
         return holderUser;
     }
 
-    public void setHolderUser(User holderUser) {
+    public void setHolderUser(Users holderUser) {
         this.holderUser = holderUser;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public LocalDate getBirthDate() {
@@ -181,3 +144,4 @@ public class HealthProfile {
         this.updatedAt = updatedAt;
     }
 }
+
