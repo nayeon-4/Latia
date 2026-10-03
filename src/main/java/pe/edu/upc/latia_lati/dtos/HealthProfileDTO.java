@@ -1,41 +1,48 @@
 package pe.edu.upc.latia_lati.dtos;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-
-import jakarta.validation.constraints.*;
-
-
 public class HealthProfileDTO {
     private Long idHealthProfile;
 
-    @NotNull(message = "El ID del usuario propietario es obligatorio")
-    @Positive(message = "El ID del usuario propietario debe ser positivo")
+    private String firstName;
+
+    private String lastName;
+
     private Long idOwnerUser;
 
     private Long idHolderUser;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
-    @PastOrPresent(message = "La fecha de nacimiento no puede ser futura")
     private LocalDate birthDate;
 
-    @NotBlank(message = "El sexo es obligatorio")
     private String sex;
 
-    @NotBlank(message = "El tipo de sangre es obligatorio")
     private String bloodType;
 
-    @NotBlank(message = "El teléfono es obligatorio")
     private String phone;
 
-    @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private OffsetDateTime createdAt;
 
-    @PastOrPresent(message = "La fecha de actualización no puede ser futura")
     private OffsetDateTime updatedAt;
+
+    public HealthProfileDTO() {
+    }
+
+    public HealthProfileDTO(Long idHealthProfile, String firstName, String lastName, Long idOwnerUser, Long idHolderUser, LocalDate birthDate, String sex, String bloodType, String phone, Boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+        this.idHealthProfile = idHealthProfile;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.idOwnerUser = idOwnerUser;
+        this.idHolderUser = idHolderUser;
+        this.birthDate = birthDate;
+        this.sex = sex;
+        this.bloodType = bloodType;
+        this.phone = phone;
+        this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     public Long getIdHealthProfile() {
         return idHealthProfile;
@@ -43,6 +50,22 @@ public class HealthProfileDTO {
 
     public void setIdHealthProfile(Long idHealthProfile) {
         this.idHealthProfile = idHealthProfile;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Long getIdOwnerUser() {
@@ -116,4 +139,5 @@ public class HealthProfileDTO {
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

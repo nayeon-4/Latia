@@ -38,4 +38,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflict(DataIntegrityViolationException ex, HttpServletRequest request) {
         return response(409, "Duplicate value or operation conflicts with related records", request);
     }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleExplicitConflict(ConflictException ex, HttpServletRequest request) {
+        return response(409, ex.getMessage(), request);
+    }
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(Exception ex, HttpServletRequest request) {
+        return response(401, "Credenciales inválidas o sesión no vigente", request);
+    }
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(Exception ex, HttpServletRequest request) {
+        return response(403, "No tienes permiso para esta operación", request);
+    }
+    @ExceptionHandler(org.springframework.web.method.annotation.HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleMethodValidation(Exception ex, HttpServletRequest request) {
+        return response(400, "El ID y los parámetros deben ser válidos y positivos", request);
+    }
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleServiceValidation(Exception ex, HttpServletRequest request) {
+        return response(400, "Los datos no cumplen las validaciones requeridas", request);
+    }
 }

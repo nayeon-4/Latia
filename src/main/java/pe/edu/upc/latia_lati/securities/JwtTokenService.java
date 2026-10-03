@@ -15,10 +15,12 @@ import java.util.stream.Collectors;
 @Service
 public class JwtTokenService {
     private final JwtEncoder jwtEncoder;
+    private final pe.edu.upc.latia_lati.repositories.IUsersRepository users;
 
     private static final long TOKEN_VALIDITY = 5 * 60 * 60;
 
-    public JwtTokenService(JwtEncoder jwtEncoder) {
+    public JwtTokenService(JwtEncoder jwtEncoder, pe.edu.upc.latia_lati.repositories.IUsersRepository users) {
+        this.users = users;
         this.jwtEncoder = jwtEncoder;
     }
 
@@ -36,6 +38,7 @@ public class JwtTokenService {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(TOKEN_VALIDITY))
                 .claim("roles", roles)
+                .claim("userId", users.findByUsername(userDetails.getUsername()).orElseThrow().getIdUser())
                 .build();
 
         JwsHeader header = JwsHeader

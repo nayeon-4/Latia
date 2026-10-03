@@ -1,14 +1,17 @@
 package pe.edu.upc.latia_lati.serviceinterfaces;
-
 import java.util.List;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.Optional;
-
 import pe.edu.upc.latia_lati.entities.HealthProfile;
-
+import pe.edu.upc.latia_lati.dtos.*;
 public interface IHealthProfileService {
-    public void insert(HealthProfile healthProfile);
-    public List<HealthProfile> list();
-    public void update(HealthProfile healthProfile);
-    public void delete(Long idHealthProfile);
-    public Optional<HealthProfile> listId(Long id);
+    HealthProfileDTO create(@Valid @NotNull HealthProfileRequestDTO request);
+    List<HealthProfileDTO> list();
+    HealthProfileDTO find(@NotNull @Positive Long id);
+    HealthProfileDTO update(@NotNull @Positive Long id, @Valid @NotNull HealthProfileRequestDTO request);
+    void delete(@NotNull @Positive Long id);
+    // Se conserva para los otros módulos. Solo devuelve perfiles del propietario autenticado.
+    Optional<HealthProfile> listId(@NotNull @Positive Long id);
 }

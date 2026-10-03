@@ -14,7 +14,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Demo API")
+                        .title("Latia API")
                         .version("1.0")
                         .description("API REST con Spring Security y JWT"))
                 .components(new Components()

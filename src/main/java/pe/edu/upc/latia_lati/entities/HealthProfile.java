@@ -16,6 +16,12 @@ public class HealthProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idHealthProfile;
 
+    // Nullable para conservar perfiles heredados sin inventar nombres.
+    @Column(name = "firstName", length = 100)
+    private String firstName;
+    @Column(name = "lastName", length = 100)
+    private String lastName;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "idOwnerUser", nullable = false)
     private Users ownerUser;
@@ -63,6 +69,11 @@ public class HealthProfile {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
     public Long getIdHealthProfile() {
         return idHealthProfile;

@@ -28,6 +28,7 @@ public class LoginController {
         this.jwtTokenService = jwtTokenService;
     }
 
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements
     @PostMapping
     public ResponseEntity<LoginResponseDTO> login(
             @RequestBody LoginRequestDTO request) {

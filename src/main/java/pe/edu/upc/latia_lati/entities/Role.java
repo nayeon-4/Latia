@@ -1,6 +1,7 @@
 package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 
@@ -43,6 +44,7 @@ public class Role implements Serializable {
         this.rol = rol;
     }
 
+    @JsonIgnore
     public Users getUser() {
         return user;
     }

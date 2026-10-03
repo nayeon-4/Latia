@@ -1,42 +1,41 @@
 package pe.edu.upc.latia_lati.dtos;
 
-import java.time.OffsetDateTime;
-
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.*;
 
+/** Entrada de alta: ID, roles, estado y fechas siempre los decide el servidor. */
 public class UsersRequestDTO {
-    private Long idUser;
-    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @NotBlank
+    @Size(max = 100)
     private String firstName;
 
-    @NotBlank(message = "El apellido del usuario es obligatorio")
+    @NotBlank
+    @Size(max = 100)
     private String lastName;
 
-    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @NotBlank
+    @Pattern(regexp = "[A-Za-z0-9._-]{3,50}")
     private String username;
 
-    @NotBlank(message = "El correo electrónico es obligatorio")
-    @Email(message = "El correo electrónico debe tener un formato válido")
+    @NotBlank
+    @Email
+    @Size(max = 150)
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    private String passwordHash;
+    @JsonAlias("passwordHash")
+    @NotBlank
+    @Size(min = 8, max = 72)
+    private String password;
 
-    @NotNull(message = "El estado activo es obligatorio")
-    private Boolean active;
-
-    @PastOrPresent(message = "La fecha de creación no puede ser futura")
-    private OffsetDateTime createdAt;
-
-    @PastOrPresent(message = "La fecha de actualización no puede ser futura")
-    private OffsetDateTime updatedAt;
-
-    public Long getIdUser() {
-        return idUser;
+    public UsersRequestDTO() {
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public UsersRequestDTO(String firstName, String lastName, String username, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -71,35 +70,12 @@ public class UsersRequestDTO {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }
