@@ -1,5 +1,7 @@
 package pe.edu.upc.latia_lati.configs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,16 +11,15 @@ import pe.edu.upc.latia_lati.entities.*;
 import pe.edu.upc.latia_lati.repositories.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Component
 @ConditionalOnProperty(name = "latia.demo-data.enabled", havingValue = "true")
 public class DemoDataInitializer implements CommandLineRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoDataInitializer.class);
     private static final String DEMO_USERNAME_PREFIX = "latia.ficticio.";
     private static final String LEGACY_DEMO_USERNAME_PREFIX = "demo.latia.";
     private static final List<String> DEMO_USERNAMES = List.of(
@@ -76,8 +77,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         syncUserSequenceIfNeeded();
-        removePreviousDemoData();
-        if (DEMO_USERNAMES.stream().anyMatch(username -> usersRepository.findByUsername(username).isPresent())) {
+        if (hasExistingDemoUsers()) {
+            LOGGER.info("Demo data already exists; skipping demo data initialization.");
             return;
         }
 
@@ -119,77 +120,20 @@ public class DemoDataInitializer implements CommandLineRunner {
         }
     }
 
-    private void removePreviousDemoData() {
-        List<Users> previousDemoUsers = new ArrayList<>();
+    private boolean hasExistingDemoUsers() {
         for (String username : DEMO_USERNAMES) {
-            usersRepository.findByUsername(username).ifPresent(previousDemoUsers::add);
+            if (usersRepository.findByUsername(username).isPresent()) {
+                return true;
+            }
         }
         for (int i = 1; i <= 5; i++) {
-            usersRepository.findByUsername(LEGACY_DEMO_USERNAME_PREFIX + String.format("%02d", i))
-                    .ifPresent(previousDemoUsers::add);
-            usersRepository.findByUsername(DEMO_USERNAME_PREFIX + String.format("%02d", i))
-                    .ifPresent(previousDemoUsers::add);
+            String suffix = String.format("%02d", i);
+            if (usersRepository.findByUsername(LEGACY_DEMO_USERNAME_PREFIX + suffix).isPresent()
+                    || usersRepository.findByUsername(DEMO_USERNAME_PREFIX + suffix).isPresent()) {
+                return true;
+            }
         }
-        if (previousDemoUsers.isEmpty()) {
-            return;
-        }
-
-        List<HealthProfile> profiles = healthProfileRepository.findByOwnerUserIn(previousDemoUsers);
-        List<ClinicalRecord> records = profiles.isEmpty()
-                ? List.of()
-                : clinicalRecordRepository.findByHealthProfileIn(profiles);
-        List<MedicalDocuments> documents = profiles.isEmpty()
-                ? List.of()
-                : medicalDocumentsRepository.findByHealthProfileIn(profiles);
-        List<MedicationTreatment> treatments = records.isEmpty()
-                ? List.of()
-                : medicationTreatmentRepository.findByClinicalRecordIn(records);
-
-        if (!profiles.isEmpty()) {
-            emergencyContactRepository.deleteAll(
-                    emergencyContactRepository.findByHealthProfileIn(profiles));
-            familyRelationshipRepository.deleteAll(
-                    familyRelationshipRepository.findByOriginProfileInOrRelativeProfileIn(profiles, profiles));
-        }
-        if (!records.isEmpty()) {
-            examResultRepository.deleteAll(examResultRepository.findByClinicalRecordIn(records));
-        }
-        if (!treatments.isEmpty()) {
-            medicationScheduleRepository.deleteAll(
-                    medicationScheduleRepository.findByTreatmentIn(treatments));
-        }
-
-        LinkedHashMap<Long, ClinicalRecordDocument> attachedDocuments = new LinkedHashMap<>();
-        if (!records.isEmpty()) {
-            clinicalRecordDocumentRepository.findByClinicalRecordIn(records)
-                    .forEach(link -> attachedDocuments.put(link.getId(), link));
-        }
-        if (!documents.isEmpty()) {
-            clinicalRecordDocumentRepository.findByMedicalDocumentIn(documents)
-                    .forEach(link -> attachedDocuments.put(link.getId(), link));
-        }
-        clinicalRecordDocumentRepository.deleteAll(attachedDocuments.values());
-
-        medicationTreatmentRepository.deleteAll(treatments);
-        medicalDocumentsRepository.deleteAll(documents);
-        clinicalRecordRepository.deleteAll(records);
-        healthProfileRepository.deleteAll(profiles);
-        usersRepository.deleteAll(previousDemoUsers);
-
-        removeUnusedPreviousDemoCatalogEntries();
-    }
-
-    private void removeUnusedPreviousDemoCatalogEntries() {
-        for (String name : List.of("Asma", "Migraña", "Alergia estacional", "Anemia", "Hipertensión")) {
-            medicalConditionRepository.findByNameMedicalCondition(name)
-                    .filter(condition -> !clinicalRecordRepository.existsByMedicalCondition(condition))
-                    .ifPresent(medicalConditionRepository::delete);
-        }
-        for (String name : List.of("Salbutamol", "Paracetamol", "Loratadina", "Sulfato ferroso", "Losartán")) {
-            medicationsRepository.findByNameMedications(name).stream()
-                    .filter(medication -> !medicationTreatmentRepository.existsByMedication(medication))
-                    .forEach(medicationsRepository::delete);
-        }
+        return false;
     }
 
     private List<Users> createUsers() {
