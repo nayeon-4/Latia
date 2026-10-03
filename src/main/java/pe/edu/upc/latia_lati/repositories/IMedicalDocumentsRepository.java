@@ -5,12 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pe.edu.upc.latia_lati.entities.MedicalDocuments;
+import pe.edu.upc.latia_lati.entities.HealthProfile;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface IMedicalDocumentsRepository extends JpaRepository<MedicalDocuments, Long> {
+    List<MedicalDocuments> findByHealthProfileIn(List<HealthProfile> healthProfiles);
     public List<MedicalDocuments> findByDocumentDate(LocalDate documentDate);
     @Query(value = """
     SELECT md.*

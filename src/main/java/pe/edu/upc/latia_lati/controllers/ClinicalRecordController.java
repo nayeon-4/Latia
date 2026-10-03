@@ -162,10 +162,8 @@ public class ClinicalRecordController {
                         )
                 );
 
-        // 2. Guardar la actualización
-        crS.update(cr);
+        crS.delete(cr.getIdClinicalRecord());
 
-        // 3. Responder
         return ResponseEntity.noContent().build();
     }
 

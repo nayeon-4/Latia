@@ -39,4 +39,3 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
             );
         }
     }
-
