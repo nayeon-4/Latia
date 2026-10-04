@@ -19,16 +19,8 @@ import java.util.List;
 @Component
 @ConditionalOnProperty(name = "latia.demo-data.enabled", havingValue = "true")
 public class DemoDataInitializer implements CommandLineRunner {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DemoDataInitializer.class);
-    private static final String DEMO_USERNAME_PREFIX = "latia.ficticio.";
-    private static final String LEGACY_DEMO_USERNAME_PREFIX = "demo.latia.";
-    private static final List<String> DEMO_USERNAMES = List.of(
-            "valeria.quiroz",
-            "mateo.quiroz",
-            "camila.rojas",
-            "diego.rojas",
-            "rosa.quiroz"
-    );
 
     private final IUsersRepository usersRepository;
     private final IHealthProfileRepository healthProfileRepository;
@@ -82,36 +74,25 @@ public class DemoDataInitializer implements CommandLineRunner {
             return;
         }
 
+        LOGGER.info("Initializing 50 demo records for all entities...");
+
         List<Users> users = createUsers();
         List<HealthProfile> profiles = createHealthProfiles(users);
-        List<MedicalCondition> conditions = medicalConditionRepository.saveAll(List.of(
-                new MedicalCondition(null, "Asma persistente leve",
-                        "Sintomas ocasionales con ejercicio; sin crisis recientes y con respuesta al inhalador."),
-                new MedicalCondition(null, "Migraña episodica",
-                        "Cefalea pulsante ocasional acompañada de fotofobia, sin signos neurologicos de alarma."),
-                new MedicalCondition(null, "Rinitis alergica estacional",
-                        "Congestion y estornudos durante la temporada de polen, sin dificultad respiratoria."),
-                new MedicalCondition(null, "Anemia ferropenica leve",
-                        "Hemoglobina por debajo del rango esperado; en seguimiento con suplementacion de hierro."),
-                new MedicalCondition(null, "Hipertension arterial esencial",
-                        "Presion arterial controlada con tratamiento y monitoreo domiciliario.")
-        ));
-        List<Medications> medications = medicationsRepository.saveAll(List.of(
-                new Medications(null, "Salbutamol", "Inhalador presurizado", "100 mcg por dosis"),
-                new Medications(null, "Paracetamol", "Tableta", "500 mg"),
-                new Medications(null, "Loratadina", "Tableta", "10 mg"),
-                new Medications(null, "Sulfato ferroso", "Tableta", "300 mg"),
-                new Medications(null, "Losartan", "Tableta", "50 mg")
-        ));
-
+        List<MedicalCondition> conditions = createMedicalConditions();
+        List<Medications> medications = createMedications();
         List<ClinicalRecord> clinicalRecords = createClinicalRecords(profiles, conditions);
+
         createEmergencyContacts(profiles);
         createFamilyRelationships(profiles);
         createExamResults(clinicalRecords);
+
         List<MedicationTreatment> treatments = createMedicationTreatments(clinicalRecords, medications);
         createMedicationSchedules(treatments);
+
         List<MedicalDocuments> documents = createMedicalDocuments(profiles);
         createClinicalRecordDocuments(clinicalRecords, documents);
+
+        LOGGER.info("50 demo records initialized successfully!");
     }
 
     private void syncUserSequenceIfNeeded() {
@@ -121,211 +102,250 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private boolean hasExistingDemoUsers() {
-        for (String username : DEMO_USERNAMES) {
-            if (usersRepository.findByUsername(username).isPresent()) {
-                return true;
-            }
-        }
-        for (int i = 1; i <= 5; i++) {
-            String suffix = String.format("%02d", i);
-            if (usersRepository.findByUsername(LEGACY_DEMO_USERNAME_PREFIX + suffix).isPresent()
-                    || usersRepository.findByUsername(DEMO_USERNAME_PREFIX + suffix).isPresent()) {
-                return true;
-            }
-        }
-        return false;
+        return usersRepository.findByUsername("valeria.quiroz").isPresent();
     }
 
     private List<Users> createUsers() {
+        String[] firstNames = {
+                "Valeria", "Mateo", "Camila", "Diego", "Rosa", "Carlos", "Sofia", "Juan", "Lucia", "Gabriel",
+                "Andrea", "Fernando", "Paula", "Javier", "Elena", "Santiago", "Mariana", "Alejandro", "Daniela", "Gonzalo",
+                "Claudia", "Sebastian", "Beatriz", "Manuel", "Patricia", "Ricardo", "Teresa", "Hugo", "Isabel", "Adrian",
+                "Monica", "Felipe", "Alonso", "Esteban", "Natalia", "Rodrigo", "Lorena", "Emilio", "Vanessa", "Ignacio",
+                "Silvia", "Joaquin", "Carmen", "Julio", "Irene", "Tomas", "Gisela", "Oscar", "Veronica", "Guillermo"
+        };
+        String[] lastNames = {
+                "Quiroz", "Rojas", "Herrera", "Salazar", "Fernandez", "Campos", "Vargas", "Lopez", "Gomez", "Torres",
+                "Diaz", "Morales", "Romero", "Alvarez", "Mendoza", "Rios", "Castro", "Ortiz", "Silva", "Nunez",
+                "Guerrero", "Medina", "Cortes", "Reyes", "Guzman", "Pena", "Delgado", "Vega", "Ruiz", "Suarez",
+                "Aguilar", "Ramos", "Soto", "Navarro", "Paredes", "Espinoza", "Lara", "Miranda", "Arias", "Benitez",
+                "Ibarra", "Ponce", "Cabrera", "Flores", "Acosta", "Villanueva", "Mejia", "Castillo", "Perez", "Sanchez"
+        };
+
         List<Users> users = new ArrayList<>();
-        String[] firstNames = {"Valeria", "Mateo", "Camila", "Diego", "Rosa"};
-        String[] lastNames = {"Quiroz", "Quiroz", "Rojas", "Rojas", "Quiroz"};
-        for (int i = 1; i <= 5; i++) {
+        String encodedPassword = passwordEncoder.encode("LatiaDemo2026!");
+
+        for (int i = 0; i < 50; i++) {
+            String firstName = firstNames[i];
+            String lastName = lastNames[i];
+
+            // Username basado en el nombre y apellido real (ej. valeria.quiroz, mateo.rojas)
+            String cleanFirstName = firstName.toLowerCase().replaceAll("[^a-z0-9]", "");
+            String cleanLastName = lastName.toLowerCase().replaceAll("[^a-z0-9]", "");
+            String realUsername = cleanFirstName + "." + cleanLastName;
+
             Users user = new Users();
-            user.setFirstName(firstNames[i - 1]);
-            user.setLastName(lastNames[i - 1]);
-            user.setUsername(DEMO_USERNAMES.get(i - 1));
-            user.setEmail(firstNames[i - 1].toLowerCase() + "." + lastNames[i - 1].toLowerCase()
-                    + "@example.com");
-            user.setPasswordHash(passwordEncoder.encode("LatiaDemo2026!"));
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setUsername(realUsername);
+            user.setEmail(realUsername + "@example.com");
+            user.setPasswordHash(encodedPassword);
             user.setActive(true);
 
             Role role = new Role();
-            role.setRol("ROLE_USER");
+            role.setRol(i == 0 ? "ROLE_ADMIN" : "ROLE_USER");
             role.setUser(user);
             user.getRoles().add(role);
+
             users.add(usersRepository.save(user));
         }
         return users;
     }
 
     private List<HealthProfile> createHealthProfiles(List<Users> users) {
+        String[] bloodTypes = {"O+", "A-", "B+", "O-", "AB+", "A+", "B-", "AB-"};
+        String[] sexes = {"Femenino", "Masculino"};
         List<HealthProfile> profiles = new ArrayList<>();
-        LocalDate[] birthDates = {
-                LocalDate.of(1991, 4, 18),
-                LocalDate.of(1986, 11, 2),
-                LocalDate.of(1998, 7, 25),
-                LocalDate.of(1979, 2, 14),
-                LocalDate.of(1964, 9, 9)
-        };
-        String[] bloodTypes = {"O+", "A-", "B+", "O-", "AB+"};
-        String[] phones = {"+51 923 822 101", "+51 959 991 097", "+51 989 325 881",
-                "+51 902 242 569", "+51 935 183 025"};
-        String[] sexes = {"Femenino", "Masculino", "Femenino", "Masculino", "Femenino"};
+
         for (int i = 0; i < users.size(); i++) {
+            Users currentUser = users.get(i);
+
             HealthProfile profile = new HealthProfile();
-            profile.setOwnerUser(users.get(i));
-            profile.setBirthDate(birthDates[i]);
-            profile.setSex(sexes[i]);
-            profile.setBloodType(bloodTypes[i]);
-            profile.setPhone(phones[i]);
+            profile.setOwnerUser(currentUser);
+            // Asignación explícita de id_holder_user (Holder User)
+            profile.setHolderUser(currentUser);
+
+            profile.setBirthDate(LocalDate.of(1965 + (i % 35), (i % 12) + 1, (i % 28) + 1));
+            profile.setSex(sexes[i % 2]);
+            profile.setBloodType(bloodTypes[i % 8]);
+            profile.setPhone("+51 900 000 " + String.format("%03d", i + 1));
             profile.setActive(true);
             profiles.add(healthProfileRepository.save(profile));
         }
         return profiles;
     }
 
-    private List<ClinicalRecord> createClinicalRecords(
-            List<HealthProfile> profiles,
-            List<MedicalCondition> conditions) {
-        String[] types = {"Consulta", "Laboratorio", "Seguimiento", "Evaluación", "Control"};
-        String[] titles = {
-                "Control respiratorio", "Revisión neurológica", "Consulta por alergia",
-                "Control de hemograma", "Control de presión"
+    private List<MedicalCondition> createMedicalConditions() {
+        String[] names = {
+                "Asma persistente leve", "Migraña episodica", "Rinitis alergica estacional", "Anemia ferropenica leve",
+                "Hipertension arterial esencial", "Diabetes Mellitus Tipo 2", "Hipotiroidismo subclinico", "Gastritis cronica",
+                "Dislipidemia", "Artrosis de rodilla", "Dermatitis atopica", "Sindrome de intestino irritable",
+                "Insomnio primario", "Ansiedad generalizada", "Lumbalgia mecanica", "Esteatosis hepatica",
+                "Reflujo gastroesofagico", "Gota", "Osteopenia", "Hiperuricemia",
+                "Bronquitis cronica", "Alergia alimentaria", "Vertigo posicional", "Otitis media recurrente",
+                "Fibromialgia", "Apnea del sueno", "Insuficiencia venosa", "Sindrome del tunel carpiano",
+                "Conjuntivitis alergica", "Eczema numular", "Nodulo tiroideo benigno", "Psoriasis leve",
+                "Colelitiasis asintomatica", "Nefritis leve", "Taquicardia sinusal", "Arritmia leve",
+                "Sindrome metabolico", "Esteatohepatitis", "Trastorno depresivo leve", "Cefalea tensional",
+                "Glaucoma de angulo abierto", "Catarata senil inicial", "Incontinencia de esfuerzo", "Prostatitis cronica",
+                "Poliposis nasal", "Rosacea", "Sindrome de Sjogren", "Vitiligo", "Endometriosis leve", "Fascitis plantar"
         };
+
+        List<MedicalCondition> list = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            list.add(new MedicalCondition(
+                    null,
+                    names[i],
+                    "Descripcion clinica parametrizada y evaluacion continua para la condicion " + names[i] + "."
+            ));
+        }
+        return medicalConditionRepository.saveAll(list);
+    }
+
+    private List<Medications> createMedications() {
+        String[] names = {
+                "Salbutamol", "Paracetamol", "Loratadina", "Sulfato ferroso", "Losartan",
+                "Metformina", "Levotiroxina", "Omeprazol", "Atorvastatina", "Ibuprofeno",
+                "Cetirizina", "Esomeprazol", "Zolpidem", "Sertralina", "Naproxeno",
+                "Simvastatina", "Ranitidina", "Allopurinol", "Calcio + Vitamina D", "Colchicina",
+                "Budesonida", "Desloratadina", "Betahistina", "Amoxicilina", "Pregabalina",
+                "Melatonina", "Diosmina", "Fisioterapia gel", "Olopatadina", "Hidrocortisona",
+                "Levotiroxina 25mcg", "Metotrexato", "Acido ursodesoxicolico", "Enalapril", "Propranolol",
+                "Amlodipino", "Metformina 500mg", "Vitamina E", "Fluoxetina", "Clonazepam",
+                "Latanoprost", "Lagrimas artificiales", "Tamsulosina", "Ciprofloxacino", "Fluticasona",
+                "Ivermectina", "Carboximetilcelulosa", "Tacrolimus", "Dienogest", "Diclofenaco gel"
+        };
+        String[] forms = {"Tableta", "Inhalador", "Capsula", "Jarabe", "Gotas", "Crema", "Unguentos", "Solucion"};
+
+        List<Medications> list = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            list.add(new Medications(null, names[i], forms[i % 8], ((i + 1) * 5) + " mg/dosis"));
+        }
+        return medicationsRepository.saveAll(list);
+    }
+
+    private List<ClinicalRecord> createClinicalRecords(List<HealthProfile> profiles, List<MedicalCondition> conditions) {
+        String[] types = {"Consulta", "Laboratorio", "Seguimiento", "Evaluacion", "Control"};
+        String[] professionals = {"Dra. Andrea Salazar", "Dr. Pablo Herrera", "Dra. Natalia Campos", "Dr. Luis Fernandez", "Dra. Elena Vargas"};
+
         List<ClinicalRecord> records = new ArrayList<>();
-        String[] descriptions = {
-                "Paciente refiere episodios de tos y sibilancias al realizar ejercicio. "
-                        + "Se revisa tecnica de inhalacion y se indica control en cuatro semanas.",
-                "Consulta por cefalea pulsante unilateral con fotofobia, sin signos de alarma. "
-                        + "Se recomienda hidratacion, descanso y seguimiento si aumenta la frecuencia.",
-                "Estornudos y congestion nasal recurrentes durante la temporada de polen. "
-                        + "Se revisan medidas para reducir exposicion a alergenos.",
-                "Refiere cansancio durante las ultimas semanas. Hemograma compatible con anemia leve; "
-                        + "se indica suplementacion y nuevo control en dos meses.",
-                "Control de hipertension sin sintomas actuales. Se revisan mediciones domiciliarias "
-                        + "y se refuerzan recomendaciones de alimentacion y actividad fisica."
-        };
-        String[] professionals = {
-                "Dra. Andrea Salazar", "Dr. Pablo Herrera", "Dra. Natalia Campos",
-                "Dr. Luis Fernandez", "Dra. Elena Vargas"
-        };
-        for (int i = 0; i < profiles.size(); i++) {
-            ClinicalRecord record = new ClinicalRecord(
+        for (int i = 0; i < 50; i++) {
+            records.add(new ClinicalRecord(
                     null,
                     profiles.get(i),
-                    types[i],
-                    titles[i],
-                    descriptions[i],
-                    Date.from(LocalDate.now().minusDays(10L + i)
-                            .atStartOfDay().toInstant(ZoneOffset.UTC)),
-                    professionals[i],
-                    conditions.get(i));
-            records.add(clinicalRecordRepository.save(record));
+                    types[i % 5],
+                    "Registro clinico " + (i + 1) + " - " + conditions.get(i).getNameMedicalCondition(),
+                    "Evaluacion medica detallada y evolucion de sintomas de " + conditions.get(i).getNameMedicalCondition() + ".",
+                    Date.from(LocalDate.now().minusDays(i + 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
+                    professionals[i % 5],
+                    conditions.get(i)
+            ));
         }
-        return records;
+        return clinicalRecordRepository.saveAll(records);
     }
 
     private void createEmergencyContacts(List<HealthProfile> profiles) {
-        String[] names = {"Mateo Quiroz", "Valeria Quiroz", "Diego Rojas", "Camila Rojas", "Lucia Quiroz"};
-        String[] phones = {"+51 923 822 101", "+51 959 991 097", "+51 989 325 881",
-                "+51 902 242 569", "+51 935 183 025"};
-        String[] relationships = {"Hermano", "Hermana", "Esposo", "Esposa", "Hija"};
+        String[] relationships = {"Hermano", "Hermana", "Esposo", "Esposa", "Hija", "Madre", "Padre", "Tio"};
         List<EmergencyContact> contacts = new ArrayList<>();
-        for (int i = 0; i < profiles.size(); i++) {
+
+        for (int i = 0; i < 50; i++) {
             contacts.add(new EmergencyContact(
-                    null, profiles.get(i), names[i], phones[i], relationships[i], true, null, null));
+                    null,
+                    profiles.get(i),
+                    "Contacto de Emergencia " + (i + 1),
+                    "+51 900 000 " + String.format("%03d", i + 100),
+                    relationships[i % 8],
+                    true, null, null
+            ));
         }
         emergencyContactRepository.saveAll(contacts);
     }
 
     private void createFamilyRelationships(List<HealthProfile> profiles) {
-        String[] relationships = {"Hermanos", "Hermanos", "Esposos", "Esposos", "Madre e hija"};
-        List<FamilyRelationship> familyRelationships = new ArrayList<>();
-        for (int i = 0; i < profiles.size(); i++) {
-            int relativeIndex = switch (i) {
-                case 0 -> 1;
-                case 1 -> 0;
-                case 2 -> 3;
-                case 3 -> 2;
-                default -> 0;
-            };
-            familyRelationships.add(new FamilyRelationship(
-                    null, profiles.get(i), profiles.get(relativeIndex), relationships[i]));
+        String[] types = {"Hermanos", "Esposos", "Madre e hija", "Padre e hijo", "Primos"};
+        List<FamilyRelationship> list = new ArrayList<>();
+
+        for (int i = 0; i < 50; i++) {
+            int relativeIndex = (i + 1) % 50;
+            list.add(new FamilyRelationship(
+                    null,
+                    profiles.get(i),
+                    profiles.get(relativeIndex),
+                    types[i % 5]
+            ));
         }
-        familyRelationshipRepository.saveAll(familyRelationships);
+        familyRelationshipRepository.saveAll(list);
     }
 
     private void createExamResults(List<ClinicalRecord> records) {
-        String[] parameters = {"Saturacion de oxigeno", "Presion arterial", "IgE total",
-                "Hemoglobina", "Presion arterial"};
-        String[] values = {"97", "118/76", "186", "10.8", "132/82"};
-        String[] units = {"%", "mmHg", "UI/mL", "g/dL", "mmHg"};
+        String[] params = {"Saturacion de oxigeno", "Presion arterial", "IgE total", "Hemoglobina", "Glucosa", "Colesterol", "Trigliceridos", "TSH"};
+        String[] units = {"%", "mmHg", "UI/mL", "g/dL", "mg/dL", "mg/dL", "mg/dL", "uIU/mL"};
+
         List<ExamResult> results = new ArrayList<>();
-        for (int i = 0; i < records.size(); i++) {
-            results.add(new ExamResult(null, records.get(i), parameters[i], values[i], units[i]));
+        for (int i = 0; i < 50; i++) {
+            results.add(new ExamResult(
+                    null,
+                    records.get(i),
+                    params[i % 8],
+                    String.valueOf(80 + (i % 40)),
+                    units[i % 8]
+            ));
         }
         examResultRepository.saveAll(results);
     }
 
-    private List<MedicationTreatment> createMedicationTreatments(
-            List<ClinicalRecord> records,
-            List<Medications> medications) {
-        String[] doses = {"2 inhalaciones cuando sea necesario", "1 tableta si inicia la cefalea",
-                "1 tableta al dia", "1 tableta al dia con alimentos", "1 tableta al dia"};
-        String[] routes = {"Inhalatoria", "Oral", "Oral", "Oral", "Oral"};
+    private List<MedicationTreatment> createMedicationTreatments(List<ClinicalRecord> records, List<Medications> medications) {
+        String[] routes = {"Inhalatoria", "Oral", "Topica", "Oftalmica", "Sublingual"};
         List<MedicationTreatment> treatments = new ArrayList<>();
-        for (int i = 0; i < records.size(); i++) {
+
+        for (int i = 0; i < 50; i++) {
             treatments.add(new MedicationTreatment(
                     null,
                     records.get(i),
                     medications.get(i),
-                    doses[i],
-                    routes[i],
+                    "1 dosis cada " + (((i % 3) + 1) * 8) + " horas",
+                    routes[i % 5],
                     LocalDate.now().minusDays(i),
-                    i == 4 ? null : LocalDate.now().plusDays(30L + i)));
+                    (i % 5 == 0) ? null : LocalDate.now().plusDays(20 + i)
+            ));
         }
         return medicationTreatmentRepository.saveAll(treatments);
     }
 
     private void createMedicationSchedules(List<MedicationTreatment> treatments) {
+        int[] intervals = {6, 8, 12, 24};
         List<MedicationSchedule> schedules = new ArrayList<>();
-        int[] reminderHours = {8, 9, 7, 8, 20};
-        int[] intervals = {6, 8, 24, 24, 24};
-        for (int i = 0; i < treatments.size(); i++) {
+
+        for (int i = 0; i < 50; i++) {
             schedules.add(new MedicationSchedule(
                     null,
                     treatments.get(i),
-                    LocalDate.now().plusDays(1).atTime(reminderHours[i], 0),
-                    intervals[i]));
+                    LocalDate.now().plusDays(1).atTime(6 + (i % 12), 0),
+                    intervals[i % 4]
+            ));
         }
         medicationScheduleRepository.saveAll(schedules);
     }
 
     private List<MedicalDocuments> createMedicalDocuments(List<HealthProfile> profiles) {
-        String[] types = {"Resultado de laboratorio", "Receta", "Informe médico", "Radiografía", "Control clínico"};
-        String[] titles = {
-                "Espirometria de control", "Indicaciones para cefalea", "Evaluacion de rinitis alergica",
-                "Hemograma completo", "Registro de presion arterial"
-        };
+        String[] types = {"Resultado de laboratorio", "Receta", "Informe medico", "Control clinico", "Estudio de imagen"};
         List<MedicalDocuments> documents = new ArrayList<>();
-        for (int i = 0; i < profiles.size(); i++) {
+
+        for (int i = 0; i < 50; i++) {
             documents.add(new MedicalDocuments(
                     null,
-                    types[i],
-                    titles[i],
+                    types[i % 5],
+                    "Documento Medico Expediente #" + (i + 1),
                     "https://example.com/latia/documentos-ficticios/expediente-" + (i + 1) + ".pdf",
-                    LocalDate.now().minusDays(10L + i),
-                    profiles.get(i)));
+                    LocalDate.now().minusDays(i + 1),
+                    profiles.get(i)
+            ));
         }
         return medicalDocumentsRepository.saveAll(documents);
     }
 
-    private void createClinicalRecordDocuments(
-            List<ClinicalRecord> records,
-            List<MedicalDocuments> documents) {
+    private void createClinicalRecordDocuments(List<ClinicalRecord> records, List<MedicalDocuments> documents) {
         List<ClinicalRecordDocument> links = new ArrayList<>();
-        for (int i = 0; i < records.size(); i++) {
+        for (int i = 0; i < 50; i++) {
             links.add(new ClinicalRecordDocument(null, records.get(i), documents.get(i)));
         }
         clinicalRecordDocumentRepository.saveAll(links);
