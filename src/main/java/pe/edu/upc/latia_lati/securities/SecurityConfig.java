@@ -67,7 +67,7 @@ public class SecurityConfig {
 
                         // Login público
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/api/users").permitAll()
+                        .requestMatchers("/api/users/registro").permitAll()
 
                         // Swagger
                         .requestMatchers(

@@ -5,7 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,11 +41,11 @@ public class Users implements Serializable {
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = false)
-    private LocalDate updatedAt;
+    private OffsetDateTime updatedAt;
 
     @OneToMany(
             mappedBy = "user",
@@ -115,19 +115,19 @@ public class Users implements Serializable {
         this.active = active;
     }
 
-    public LocalDate getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDate updatedAt) {
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
