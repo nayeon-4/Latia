@@ -15,4 +15,8 @@ public interface IFamilyRelationshipRepository extends JpaRepository<FamilyRelat
     List<FamilyRelationship> findByOriginProfile_IdHealthProfileOrRelativeProfile_IdHealthProfile(
             Long originProfileId,
             Long relativeProfileId);
+    // HU46/HU49: verificar si ya existe la misma relación
+    boolean existsByOriginProfile_IdHealthProfileAndRelativeProfile_IdHealthProfile(
+            Long originProfileId,
+            Long relativeProfileId);
 }
