@@ -38,7 +38,7 @@ public class UsersController {
 
         return ResponseEntity.ok(lista);
     }
-    @PostMapping
+    @PostMapping("/registro")
     public ResponseEntity<UsersResponseDTO> registrar(
             @Valid @RequestBody UsersRequestDTO request) {
 

@@ -25,12 +25,6 @@ public class UsersRequestDTO {
     @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    @PastOrPresent(message = "La fecha de creación no puede ser futura")
-    private OffsetDateTime createdAt;
-
-    @PastOrPresent(message = "La fecha de actualización no puede ser futura")
-    private OffsetDateTime updatedAt;
-
     public Long getIdUser() {
         return idUser;
     }
@@ -85,21 +79,5 @@ public class UsersRequestDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
