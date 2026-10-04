@@ -1,6 +1,7 @@
 package pe.edu.upc.latia_lati.controllers;
 
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,10 +20,12 @@ public class FamilyRelationshipController {
 
     private final IFamilyRelationshipService frS;
     private final IHealthProfileService hpS;
+    private final ModelMapper modelMapper;
 
-    public FamilyRelationshipController(IFamilyRelationshipService frS, IHealthProfileService hpS) {
+    public FamilyRelationshipController(IFamilyRelationshipService frS, IHealthProfileService hpS, ModelMapper modelMapper) {
         this.frS = frS;
         this.hpS = hpS;
+        this.modelMapper = modelMapper;
     }
 
     // HU47: Listar relaciones familiares
@@ -55,10 +58,10 @@ public class FamilyRelationshipController {
         }
 
         // 2. Armar la entidad (el id lo genera la base de datos)
-        FamilyRelationship fr = new FamilyRelationship();
+        FamilyRelationship fr = modelMapper.map(dto, FamilyRelationship.class);
+        fr.setId(null);
         fr.setOriginProfile(origen);
         fr.setRelativeProfile(familiar);
-        fr.setRelationshipType(dto.getRelationshipType());
 
         // 3. Guardar
         frS.insert(fr);
@@ -173,13 +176,11 @@ public class FamilyRelationshipController {
         }
     }
 
-    // La entidad guarda objetos HealthProfile; el DTO solo sus ids
     private FamilyRelationshipDTO convertirDTO(FamilyRelationship fr) {
-        FamilyRelationshipDTO dto = new FamilyRelationshipDTO();
+        FamilyRelationshipDTO dto = modelMapper.map(fr, FamilyRelationshipDTO.class);
         dto.setIdFamilyRelationship(fr.getId());
         dto.setIdOriginProfile(fr.getOriginProfile().getIdHealthProfile());
         dto.setIdRelativeProfile(fr.getRelativeProfile().getIdHealthProfile());
-        dto.setRelationshipType(fr.getRelationshipType());
         return dto;
     }
 }
