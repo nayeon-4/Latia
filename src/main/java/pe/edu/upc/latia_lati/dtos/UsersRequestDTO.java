@@ -1,41 +1,36 @@
 package pe.edu.upc.latia_lati.dtos;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import java.time.OffsetDateTime;
+
 import jakarta.validation.constraints.*;
 
-/** Entrada de alta: ID, roles, estado y fechas siempre los decide el servidor. */
 public class UsersRequestDTO {
-    @NotBlank
-    @Size(max = 100)
+    private Long idUser;
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "El apellido del usuario es obligatorio")
     private String lastName;
 
-    @NotBlank
-    @Pattern(regexp = "[A-Za-z0-9._-]{3,50}")
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     private String username;
 
-    @NotBlank
-    @Email
-    @Size(max = 150)
+    @NotBlank(message = "El correo electrónico es obligatorio")
+    @Email(message = "El correo electrónico debe tener un formato válido")
     private String email;
 
-    @JsonAlias("passwordHash")
-    @NotBlank
-    @Size(min = 8, max = 72)
-    private String password;
+    @NotBlank(message = "La contraseña es obligatoria")
+    private String passwordHash;
 
-    public UsersRequestDTO() {
+    @NotNull(message = "El estado activo es obligatorio")
+    private Boolean active;
+
+    public Long getIdUser() {
+        return idUser;
     }
 
-    public UsersRequestDTO(String firstName, String lastName, String username, String email, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.email = email;
-        this.password = password;
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
     }
 
     public String getFirstName() {
@@ -70,12 +65,19 @@ public class UsersRequestDTO {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }

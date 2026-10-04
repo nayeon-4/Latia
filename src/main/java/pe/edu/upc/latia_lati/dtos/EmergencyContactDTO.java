@@ -14,7 +14,7 @@ public class EmergencyContactDTO {
     private String name;
 
     @NotBlank(message = "El teléfono es obligatorio")
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "El teléfono debe tener entre 7 y 15 dígitos y puede iniciar con +")
+    @Pattern(regexp = "^\\+?[0-9]( ?[0-9]){6,14}$", message = "El teléfono debe tener entre 7 y 15 dígitos")
     private String phone;
 
     @NotBlank(message = "El parentesco es obligatorio")

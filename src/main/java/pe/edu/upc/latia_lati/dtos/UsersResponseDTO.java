@@ -1,34 +1,45 @@
 package pe.edu.upc.latia_lati.dtos;
-import java.time.LocalDate;
-/** LocalDate coincide con el esquema existente: no se inventa hora de auditoría. */
+
+import java.time.OffsetDateTime;
+
+import jakarta.validation.constraints.*;
+
+
 public class UsersResponseDTO {
     private Long idUser;
-
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     private String firstName;
 
+    @NotBlank(message = "El apellido del usuario es obligatorio")
     private String lastName;
 
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     private String username;
 
+    @NotBlank(message = "El correo electrónico es obligatorio")
+    @Email(message = "El correo electrónico debe tener un formato válido")
     private String email;
 
+    @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    private LocalDate createdAt;
+    private OffsetDateTime createdAt;
 
-    private LocalDate updatedAt;
+    private OffsetDateTime updatedAt;
 
-    public UsersResponseDTO() {
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public UsersResponseDTO(Long idUser, String firstName, String lastName, String username, String email, Boolean active, LocalDate createdAt, LocalDate updatedAt) {
-        this.idUser = idUser;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.email = email;
-        this.active = active;
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -79,21 +90,4 @@ public class UsersResponseDTO {
     public void setActive(Boolean active) {
         this.active = active;
     }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
 }

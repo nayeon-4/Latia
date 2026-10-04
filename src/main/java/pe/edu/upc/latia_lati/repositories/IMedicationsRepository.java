@@ -10,5 +10,6 @@ import java.util.List;
 public interface IMedicationsRepository extends JpaRepository<Medications, Long> {
     public List<Medications> findByNameMedications(String nameMedications);
     public List<Medications> findByDosageForm(String dosageForm);
+    boolean existsByNameMedications(String nameMedications);
 
 }

@@ -66,8 +66,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // Login público
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/users/registro").permitAll()
 
                         // Swagger
                         .requestMatchers(

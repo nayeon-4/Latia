@@ -39,7 +39,19 @@ public class ClinicalRecordController {
 
         List<ClinicalRecordDTO> lista = crS.list()
                 .stream()
-                .map(act -> modelMapper.map(act, ClinicalRecordDTO.class))
+                .map(cr -> {
+                    ClinicalRecordDTO dto = modelMapper.map(cr, ClinicalRecordDTO.class);
+
+                    if (cr.getHealthProfile() != null) {
+                        dto.setIdHealthProfile(cr.getHealthProfile().getIdHealthProfile());
+                    }
+
+                    if (cr.getMedicalCondition() != null) {
+                        dto.setIdCondition(cr.getMedicalCondition().getIdMedicalCondition());
+                    }
+
+                    return dto;
+                })
                 .toList();
 
         return ResponseEntity.ok(lista);
@@ -162,10 +174,8 @@ public class ClinicalRecordController {
                         )
                 );
 
-        // 2. Guardar la actualización
-        crS.update(cr);
+        crS.delete(cr.getIdClinicalRecord());
 
-        // 3. Responder
         return ResponseEntity.noContent().build();
     }
 

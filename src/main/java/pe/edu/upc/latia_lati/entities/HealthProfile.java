@@ -155,4 +155,3 @@ public class HealthProfile {
         this.updatedAt = updatedAt;
     }
 }
-

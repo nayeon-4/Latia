@@ -41,4 +41,3 @@ public class MedicalConditionServiceImplement implements IMedicalConditionServic
         return mcR.findById(id);
     }
 }
-
