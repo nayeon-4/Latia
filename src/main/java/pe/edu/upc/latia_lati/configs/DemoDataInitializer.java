@@ -161,6 +161,8 @@ public class DemoDataInitializer implements CommandLineRunner {
 
             HealthProfile profile = new HealthProfile();
             profile.setOwnerUser(currentUser);
+            profile.setFirstName(currentUser.getFirstName());
+            profile.setLastName(currentUser.getLastName());
             // Asignación explícita de id_holder_user (Holder User)
             profile.setHolderUser(currentUser);
 

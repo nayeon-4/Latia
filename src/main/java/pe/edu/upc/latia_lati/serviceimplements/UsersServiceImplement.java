@@ -24,7 +24,9 @@ public class UsersServiceImplement implements IUsersService {
     private final PasswordEncoder passwords;
     private final CurrentUser current;
     public UsersServiceImplement(IUsersRepository users, PasswordEncoder passwords, CurrentUser current) {
-        this.users = users; this.passwords = passwords; this.current = current;
+        this.users = users;
+        this.passwords = passwords;
+        this.current = current;
     }
 
     @Override @Transactional
@@ -35,9 +37,12 @@ public class UsersServiceImplement implements IUsersService {
         }
         checkPassword(r.getPassword());
         Users u = new Users();
-        u.setFirstName(r.getFirstName().trim()); u.setLastName(r.getLastName().trim());
-        u.setUsername(r.getUsername()); u.setEmail(email);
-        u.setPasswordHash(passwords.encode(r.getPassword())); u.setActive(true);
+        u.setFirstName(r.getFirstName().trim());
+        u.setLastName(r.getLastName().trim());
+        u.setUsername(r.getUsername());
+        u.setEmail(email);
+        u.setPasswordHash(passwords.encode(r.getPassword()));
+        u.setActive(true);
         Role role = new Role(); role.setRol("ROLE_USER"); role.setUser(u);
         u.getRoles().add(role);
         return toDTO(users.saveAndFlush(u));
@@ -49,6 +54,31 @@ public class UsersServiceImplement implements IUsersService {
         List<UsersResponseDTO> result = users.findAll(Sort.by("idUser")).stream().map(this::toDTO).toList();
         if (result.isEmpty()) throw new ResourceNotFoundException("No hay usuarios registrados");
         return result;
+    }
+
+    @Override
+    public List<UsersResponseDTO> findByActive(Boolean active) {
+        current.requireAdmin();
+        List<UsersResponseDTO> result = users.findByActiveOrderByIdUserAsc(active).stream().map(this::toDTO).toList();
+        if (result.isEmpty()) throw new ResourceNotFoundException("No hay usuarios con active=" + active);
+        return result;
+    }
+
+    @Override
+    public List<CountHealthProfilesByUserDTO> countProfilesByUser() {
+        current.requireAdmin();
+        List<CountHealthProfilesByUserDTO> result = users.getTotalHealthProfilesByUser().stream()
+                .map(row -> new CountHealthProfilesByUserDTO(((Number) row[0]).longValue(),
+                        (String) row[1], (String) row[2], (String) row[3], ((Number) row[4]).longValue()))
+                .toList();
+        if (result.isEmpty()) throw new ResourceNotFoundException("No hay usuarios para el reporte de perfiles");
+        return result;
+    }
+
+    @Override
+    public java.util.Optional<Users> listId(Long id) {
+        current.requireAdmin();
+        return users.findById(id);
     }
 
     @Override
@@ -65,8 +95,10 @@ public class UsersServiceImplement implements IUsersService {
         if (users.existsByUsernameAndIdUserNot(r.getUsername(), id) || users.existsByEmailIgnoreCaseAndIdUserNot(email, id)) {
             throw new ConflictException("El username o correo ya está registrado");
         }
-        u.setFirstName(r.getFirstName().trim()); u.setLastName(r.getLastName().trim());
-        u.setUsername(r.getUsername()); u.setEmail(email);
+        u.setFirstName(r.getFirstName().trim());
+        u.setLastName(r.getLastName().trim());
+        u.setUsername(r.getUsername());
+        u.setEmail(email);
         return toDTO(users.saveAndFlush(u));
     }
 
@@ -97,6 +129,7 @@ public class UsersServiceImplement implements IUsersService {
     private Users get(Long id) {
         return users.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el id: " + id));
     }
+    // La respuesta nunca incluye contraseña ni roles.
     private UsersResponseDTO toDTO(Users u) {
         return new UsersResponseDTO(u.getIdUser(), u.getFirstName(), u.getLastName(), u.getUsername(),
                 u.getEmail(), u.getActive(), u.getCreatedAt(), u.getUpdatedAt());

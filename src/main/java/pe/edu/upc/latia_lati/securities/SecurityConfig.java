@@ -19,9 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
+    private final SecurityErrorHandler errors;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailsService userDetailsService, SecurityErrorHandler errors) {
         this.userDetailsService = userDetailsService;
+        this.errors = errors;
     }
 
     @Bean
@@ -67,7 +69,7 @@ public class SecurityConfig {
 
                         // Login público
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/api/users/registro").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/registro").permitAll()
 
                         // Swagger
                         .requestMatchers(
@@ -84,11 +86,12 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(errors).accessDeniedHandler(errors))
+
                 .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwt ->
-                                jwt.jwtAuthenticationConverter(
-                                        new CustomJwtAuthenticationConverter()
-                                )
+                        oauth2.authenticationEntryPoint(errors).accessDeniedHandler(errors)
+                        .jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())
                         )
                 );
 

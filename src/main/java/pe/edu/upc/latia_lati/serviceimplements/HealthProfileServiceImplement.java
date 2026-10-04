@@ -20,7 +20,8 @@ public class HealthProfileServiceImplement implements IHealthProfileService {
     private final IHealthProfileRepository profiles;
     private final CurrentUser current;
     public HealthProfileServiceImplement(IHealthProfileRepository profiles, CurrentUser current) {
-        this.profiles = profiles; this.current = current;
+        this.profiles = profiles;
+        this.current = current;
     }
 
     @Override @Transactional
@@ -38,6 +39,21 @@ public class HealthProfileServiceImplement implements IHealthProfileService {
         Users actor = current.require();
         List<HealthProfile> result = profiles.findByOwnerUser_IdUserOrderByIdHealthProfileAsc(actor.getIdUser());
         if (result.isEmpty()) throw new ResourceNotFoundException("No tienes perfiles de salud registrados");
+        return result.stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public List<HealthProfileDTO> findByBloodType(String bloodType) {
+        Long ownerId = current.require().getIdUser();
+        List<HealthProfile> result = profiles.findByOwnerUser_IdUserAndBloodTypeOrderByIdHealthProfileAsc(ownerId, bloodType);
+        if (result.isEmpty()) throw new ResourceNotFoundException("No tienes perfiles con el grupo sanguíneo " + bloodType);
+        return result.stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public List<HealthProfileDTO> activeProfiles() {
+        List<HealthProfile> result = profiles.getActiveProfilesByOwner(current.require().getIdUser());
+        if (result.isEmpty()) throw new ResourceNotFoundException("No tienes perfiles de salud activos");
         return result.stream().map(this::toDTO).toList();
     }
 
@@ -83,11 +99,16 @@ public class HealthProfileServiceImplement implements IHealthProfileService {
         }
     }
     private void apply(HealthProfile hp, HealthProfileRequestDTO r, Users actor) {
-        hp.setFirstName(r.getFirstName().trim()); hp.setLastName(r.getLastName().trim());
+        hp.setFirstName(r.getFirstName().trim());
+        hp.setLastName(r.getLastName().trim());
         hp.setHolderUser(r.getIdHolderUser() == null ? null : actor);
-        hp.setBirthDate(r.getBirthDate()); hp.setSex(r.getSex().trim()); hp.setBloodType(r.getBloodType());
-        hp.setPhone(r.getPhone().trim()); hp.setActive(r.getActive());
+        hp.setBirthDate(r.getBirthDate());
+        hp.setSex(r.getSex().trim());
+        hp.setBloodType(r.getBloodType());
+        hp.setPhone(r.getPhone().trim());
+        hp.setActive(r.getActive());
     }
+    // Nombres del paciente e IDs explícitos: no se depende de ModelMapper.
     private HealthProfileDTO toDTO(HealthProfile hp) {
         return new HealthProfileDTO(hp.getIdHealthProfile(), hp.getFirstName(), hp.getLastName(),
                 hp.getOwnerUser().getIdUser(), hp.getHolderUser() == null ? null : hp.getHolderUser().getIdUser(),

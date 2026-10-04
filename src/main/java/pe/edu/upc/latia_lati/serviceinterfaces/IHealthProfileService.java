@@ -9,6 +9,8 @@ import pe.edu.upc.latia_lati.dtos.*;
 public interface IHealthProfileService {
     HealthProfileDTO create(@Valid @NotNull HealthProfileRequestDTO request);
     List<HealthProfileDTO> list();
+    List<HealthProfileDTO> findByBloodType(@NotNull @jakarta.validation.constraints.Pattern(regexp = "^(A|B|AB|O)[+-]$", message = "Tipo de sangre inválido") String bloodType);
+    List<HealthProfileDTO> activeProfiles();
     HealthProfileDTO find(@NotNull @Positive Long id);
     HealthProfileDTO update(@NotNull @Positive Long id, @Valid @NotNull HealthProfileRequestDTO request);
     void delete(@NotNull @Positive Long id);

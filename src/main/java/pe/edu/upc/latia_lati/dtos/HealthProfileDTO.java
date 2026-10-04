@@ -1,98 +1,86 @@
 package pe.edu.upc.latia_lati.dtos;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-
+import java.time.*;
 import jakarta.validation.constraints.*;
-
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class HealthProfileDTO {
     private Long idHealthProfile;
 
-    @NotNull(message = "El ID del usuario propietario es obligatorio")
-    @Positive(message = "El ID del usuario propietario debe ser positivo")
+    private String firstName;
+
+    private String lastName;
+
     private Long idOwnerUser;
 
     private Long idHolderUser;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
-    @PastOrPresent(message = "La fecha de nacimiento no puede ser futura")
     private LocalDate birthDate;
 
-    @NotBlank(message = "El sexo es obligatorio")
     private String sex;
 
-    @NotBlank(message = "El tipo de sangre es obligatorio")
     private String bloodType;
 
-    @NotBlank(message = "El teléfono es obligatorio")
     private String phone;
 
-    @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
-    public Long getIdHealthProfile() {
-        return idHealthProfile;
+    private OffsetDateTime createdAt;
+
+    private OffsetDateTime updatedAt;
+
+    public HealthProfileDTO() {
     }
 
-    public void setIdHealthProfile(Long idHealthProfile) {
+    public HealthProfileDTO(Long idHealthProfile, String firstName, String lastName, Long idOwnerUser, Long idHolderUser, LocalDate birthDate, String sex, String bloodType, String phone, Boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.idHealthProfile = idHealthProfile;
-    }
-
-    public Long getIdOwnerUser() {
-        return idOwnerUser;
-    }
-
-    public void setIdOwnerUser(Long idOwnerUser) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.idOwnerUser = idOwnerUser;
-    }
-
-    public Long getIdHolderUser() {
-        return idHolderUser;
-    }
-
-    public void setIdHolderUser(Long idHolderUser) {
         this.idHolderUser = idHolderUser;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
         this.sex = sex;
-    }
-
-    public String getBloodType() {
-        return bloodType;
-    }
-
-    public void setBloodType(String bloodType) {
         this.bloodType = bloodType;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
         this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
+
+    public Long getIdHealthProfile() { return idHealthProfile; }
+    public void setIdHealthProfile(Long idHealthProfile) { this.idHealthProfile = idHealthProfile; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public Long getIdOwnerUser() { return idOwnerUser; }
+    public void setIdOwnerUser(Long idOwnerUser) { this.idOwnerUser = idOwnerUser; }
+
+    public Long getIdHolderUser() { return idHolderUser; }
+    public void setIdHolderUser(Long idHolderUser) { this.idHolderUser = idHolderUser; }
+
+    public LocalDate getBirthDate() { return birthDate; }
+    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
+
+    public String getSex() { return sex; }
+    public void setSex(String sex) { this.sex = sex; }
+
+    public String getBloodType() { return bloodType; }
+    public void setBloodType(String bloodType) { this.bloodType = bloodType; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
+
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
+
+    public OffsetDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(OffsetDateTime updatedAt) { this.updatedAt = updatedAt; }
 
 }

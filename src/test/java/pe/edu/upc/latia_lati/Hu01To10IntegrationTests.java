@@ -192,7 +192,7 @@ class Hu01To10IntegrationTests {
         assertThat(id).isNotEqualTo(999999);
         assertThat(r.getLocation()).endsWith("/api/users/" + id);
         assertThat(r.getBody().get("active").asBoolean()).isTrue();
-        assertThat(r.getBody().get("createdAt").asText()).isEqualTo(LocalDate.now().toString());
+        assertThat(java.time.OffsetDateTime.parse(r.getBody().get("createdAt").asText()).toLocalDate()).isEqualTo(LocalDate.now().toString());
         assertThat(r.getText()).doesNotContain("passwordHash", "ROLE_ADMIN", PASSWORD);
         var u = users.findById(id).orElseThrow();
         assertThat(encoder.matches(PASSWORD, u.getPasswordHash())).isTrue();
@@ -428,5 +428,111 @@ class Hu01To10IntegrationTests {
         var legacy = registration("legacy"); legacy.remove("password"); legacy.put("passwordHash", PASSWORD);
         assertThat(call("POST", "/api/users", null, legacy).getStatus()).isEqualTo(201);
         assertThat(login("legacy", PASSWORD)).isNotBlank();
+    }
+
+    @Test void simpleUsersQueryFiltersAndRequiresAdmin() throws Exception {
+        Account a = account("alice", false); Account admin = account("admin", true);
+        jdbc.update("UPDATE users SET active=false WHERE id_user=?", a.getId());
+        Result result = call("GET", "/api/users/consulta-simple?active=false", admin.getToken(), null);
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(200);
+        assertThat(result.getBody().size()).isEqualTo(1);
+        assertThat(result.getBody().get(0).get("idUser").asLong()).isEqualTo(a.getId());
+        assertThat(result.getText()).doesNotContain("password", "roles");
+        Account b = account("bob", false);
+        assertThat(call("GET", "/api/users/consulta-simple?active=true", b.getToken(), null).getStatus()).isEqualTo(403);
+        assertThat(call("GET", "/api/users/consulta-simple?active=invalid", admin.getToken(), null).getStatus()).isEqualTo(400);
+    }
+
+    @Test void nativeUsersQueryCountsProfilesAndIncludesZero() throws Exception {
+        Account a = account("alice", false); Account admin = account("admin", true);
+        createProfile(a); createProfile(a);
+        Result result = call("GET", "/api/users/consulta-nativa", admin.getToken(), null);
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(200);
+        assertThat(result.getBody().size()).isEqualTo(2);
+        for (JsonNode row : result.getBody()) {
+            assertThat(row.get("totalProfiles").asLong()).isEqualTo(row.get("idUser").asLong() == a.getId() ? 2L : 0L);
+        }
+        assertThat(call("GET", "/api/users/consulta-nativa", a.getToken(), null).getStatus()).isEqualTo(403);
+    }
+
+    @Test void simpleProfilesQueryUsesBloodTypeAndNeverReturnsForeignProfiles() throws Exception {
+        Account a = account("alice", false); Account b = account("bob", false);
+        long own = createProfile(a); createProfile(b);
+        var different = profile(); different.put("bloodType", "A-");
+        assertThat(call("POST", "/api/healthprofiles", a.getToken(), different).getStatus()).isEqualTo(201);
+        Result result = call("GET", "/api/healthprofiles/consulta-simple?bloodType=O%2B", a.getToken(), null);
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(200);
+        assertThat(result.getBody().size()).isEqualTo(1);
+        assertThat(result.getBody().get(0).get("idHealthProfile").asLong()).isEqualTo(own);
+        assertThat(call("GET", "/api/healthprofiles/consulta-simple?bloodType=X", a.getToken(), null).getStatus()).isEqualTo(400);
+        Result empty = call("GET", "/api/healthprofiles/consulta-simple?bloodType=AB-", a.getToken(), null);
+        assertThat(empty.getStatus()).isEqualTo(404);
+        assertThat(empty.getBody().get("message").asText()).contains("No tienes perfiles");
+    }
+
+    @Test void nativeProfilesQueryReturnsOnlyOwnedActiveProfiles() throws Exception {
+        Account a = account("alice", false); Account b = account("bob", false);
+        long active = createProfile(a); createProfile(b);
+        var inactive = profile(); inactive.put("active", false);
+        assertThat(call("POST", "/api/healthprofiles", a.getToken(), inactive).getStatus()).isEqualTo(201);
+        Result result = call("GET", "/api/healthprofiles/consulta-nativa", a.getToken(), null);
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(200);
+        assertThat(result.getBody().size()).isEqualTo(1);
+        assertThat(result.getBody().get(0).get("idHealthProfile").asLong()).isEqualTo(active);
+        jdbc.update("UPDATE health_profiles SET active=false WHERE id_owner_user=?", a.getId());
+        assertThat(call("GET", "/api/healthprofiles/consulta-nativa", a.getToken(), null).getStatus()).isEqualTo(404);
+    }
+
+    @Test void securityErrorsHaveUserVisibleJsonIncludingInvalidJwt() throws Exception {
+        Result absent = call("GET", "/api/healthprofiles", null, null);
+        assertThat(absent.getStatus()).isEqualTo(401);
+        assertThat(absent.getBody().get("message").asText()).contains("Authorize");
+        assertThat(absent.getBody().get("path").asText()).isEqualTo("/api/healthprofiles");
+        Result invalid = call("GET", "/api/users", "not-a-jwt", null);
+        assertThat(invalid.getStatus()).isEqualTo(401);
+        assertThat(invalid.getBody().get("message").asText()).isNotBlank();
+    }
+
+    @Test void validationErrorsTellTheUserWhatToFix() throws Exception {
+        var invalid = registration("alice"); invalid.put("email", "invalid");
+        Result result = call("POST", "/api/users", null, invalid);
+        assertThat(result.getStatus()).isEqualTo(400);
+        assertThat(result.getBody().get("message").asText()).contains("email", "formato válido");
+        Account a = account("alice", false);
+        Result missing = call("GET", "/api/healthprofiles/consulta-simple", a.getToken(), null);
+        assertThat(missing.getStatus()).isEqualTo(400);
+        assertThat(missing.getBody().get("message").asText()).contains("bloodType");
+        var date = profile(); date.put("birthDate", "not-a-date");
+        Result wrongDate = call("POST", "/api/healthprofiles", a.getToken(), date);
+        assertThat(wrongDate.getStatus()).isEqualTo(400);
+        assertThat(wrongDate.getBody().get("message").asText()).contains("AAAA-MM-DD");
+    }
+
+    @Test void registrationAliasKeepsTheCanonicalLocation() throws Exception {
+        Result result = call("POST", "/api/users/registro", null, registration("alice"));
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(201);
+        assertThat(result.getLocation()).endsWith("/api/users/" + result.getBody().get("idUser").asLong());
+        assertThat(login("alice", PASSWORD)).isNotBlank();
+    }
+
+    @Test void ordinaryUsersCannotGrantThemselvesAdminRoles() throws Exception {
+        Account a = account("alice", false);
+        Result result = call("POST", "/api/roles", a.getToken(), Map.of("idUser", a.getId(), "rol", "ROLE_ADMIN"));
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(403);
+        assertThat(users.findById(a.getId()).orElseThrow().getRoles()).extracting(Role::getRol).containsExactly("ROLE_USER");
+    }
+
+    @Test void swaggerDocumentsAllQueriesAndSafeRequestDtos() throws Exception {
+        Result result = call("GET", "/v3/api-docs", null, null);
+        assertThat(result.getStatus()).as(result.getText()).isEqualTo(200);
+        JsonNode paths = result.getBody().get("paths");
+        assertThat(paths.has("/api/users/consulta-simple")).isTrue();
+        assertThat(paths.has("/api/users/consulta-nativa")).isTrue();
+        assertThat(paths.has("/api/healthprofiles/consulta-simple")).isTrue();
+        assertThat(paths.has("/api/healthprofiles/consulta-nativa")).isTrue();
+        JsonNode properties = result.getBody().get("components").get("schemas").get("UsersRequestDTO").get("properties");
+        assertThat(properties.has("password")).isTrue();
+        assertThat(properties.has("passwordHash")).isFalse();
+        assertThat(properties.has("idUser")).isFalse();
     }
 }

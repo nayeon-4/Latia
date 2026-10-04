@@ -4,38 +4,38 @@ import java.time.LocalDate;
 
 /** El propietario se deriva del JWT. Si se envía, su ID debe coincidir. */
 public class HealthProfileRequestDTO {
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre admite hasta 100 caracteres")
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(max = 100, message = "El apellido admite hasta 100 caracteres")
     private String lastName;
 
-    @Positive
+    @Positive(message = "El ID debe ser positivo")
     private Long idOwnerUser;
 
-    @Positive
+    @Positive(message = "El ID debe ser positivo")
     private Long idHolderUser;
 
-    @NotNull
-    @PastOrPresent
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
+    @PastOrPresent(message = "La fecha de nacimiento no puede ser futura")
     private LocalDate birthDate;
 
-    @NotBlank
-    @Size(max = 30)
+    @NotBlank(message = "El sexo es obligatorio")
+    @Size(max = 30, message = "El sexo admite hasta 30 caracteres")
     private String sex;
 
-    @NotBlank
+    @NotBlank(message = "El tipo de sangre es obligatorio")
     @Pattern(regexp = "^(A|B|AB|O)[+-]$", message = "Tipo de sangre inválido")
     private String bloodType;
 
-    @NotBlank
-    @Size(max = 30)
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Size(max = 30, message = "El teléfono admite hasta 30 caracteres")
     @Pattern(regexp = "^[+0-9() .-]{5,30}$", message = "Teléfono inválido")
     private String phone;
 
-    @NotNull
+    @NotNull(message = "El estado activo es obligatorio")
     private Boolean active;
 
     public HealthProfileRequestDTO() {

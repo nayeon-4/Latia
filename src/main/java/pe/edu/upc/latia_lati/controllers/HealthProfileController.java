@@ -1,202 +1,76 @@
 package pe.edu.upc.latia_lati.controllers;
 
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pe.edu.upc.latia_lati.dtos.HealthProfileDTO;
-import pe.edu.upc.latia_lati.entities.HealthProfile;
-import pe.edu.upc.latia_lati.entities.Users;
-import pe.edu.upc.latia_lati.exceptions.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import pe.edu.upc.latia_lati.dtos.*;
 import pe.edu.upc.latia_lati.serviceinterfaces.IHealthProfileService;
-import pe.edu.upc.latia_lati.serviceinterfaces.IUsersService;
-
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
+@io.swagger.v3.oas.annotations.responses.ApiResponses({
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos o parámetros inválidos", content = @io.swagger.v3.oas.annotations.media.Content(schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ErrorResponse.class))),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Falta iniciar sesión o el token no es válido"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "No tienes permiso"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Recurso inexistente o búsqueda sin resultados"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Duplicado o dependencias que impiden la operación"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "503", description = "Base de datos no disponible")
+})
 @RestController
 @RequestMapping("/api/healthprofiles")
+@Tag(name = "Perfiles de salud", description = "HU06–HU10: CRUD y consultas de los perfiles propios")
 public class HealthProfileController {
-
     private final IHealthProfileService hpS;
-    private final IUsersService uS;
-    private final ModelMapper modelMapper;
+    public HealthProfileController(IHealthProfileService hpS) { this.hpS = hpS; }
 
-    public HealthProfileController(IHealthProfileService hpS, IUsersService uS, ModelMapper modelMapper) {
-        this.hpS = hpS;
-        this.uS = uS;
-        this.modelMapper = modelMapper;
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Registro creado")
+    @PostMapping
+    @Operation(summary = "HU06: Crear perfil de salud", description = "El propietario proviene del JWT. Para un dependiente, idHolderUser=null.")
+    public ResponseEntity<HealthProfileDTO> registrar(@Valid @RequestBody HealthProfileRequestDTO request) {
+        HealthProfileDTO result = hpS.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(result.getIdHealthProfile()).toUri();
+        return ResponseEntity.created(location).body(result);
     }
 
     @GetMapping
-    public ResponseEntity<List<HealthProfileDTO>> listar() {
-
-        List<HealthProfileDTO> lista = hpS.list()
-                .stream()
-                .map(healthProfile -> {
-                    HealthProfileDTO dto = modelMapper.map(healthProfile, HealthProfileDTO.class);
-
-                    if (healthProfile.getOwnerUser() != null) {
-                        dto.setIdOwnerUser(healthProfile.getOwnerUser().getIdUser());
-                    }
-
-                    if (healthProfile.getHolderUser() != null) {
-                        dto.setIdHolderUser(healthProfile.getHolderUser().getIdUser());
-                    }
-
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(lista);
-    }
-
-    @PostMapping
-    public ResponseEntity<HealthProfileDTO> registrar(
-            @Valid @RequestBody HealthProfileDTO dto) {
-
-        // 1. Verificar que el usuario propietario exista
-        Optional<Users> owner = uS.listId(dto.getIdOwnerUser());
-
-        if (owner.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "No existe el usuario propietario con el id: "
-                            + dto.getIdOwnerUser()
-            );
-        }
-
-        // 2. Verificar el usuario titular si fue enviado
-        Users holder = null;
-
-        if (dto.getIdHolderUser() != null) {
-            Optional<Users> holderOptional =
-                    uS.listId(dto.getIdHolderUser());
-
-            if (holderOptional.isEmpty()) {
-                throw new ResourceNotFoundException(
-                        "No existe el usuario titular con el id: "
-                                + dto.getIdHolderUser()
-                );
-            }
-
-            holder = holderOptional.get();
-        }
-
-        // 3. Convertir DTO a entidad
-        HealthProfile hp = modelMapper.map(dto, HealthProfile.class);
-
-        // 4. Asignar relaciones
-        hp.setOwnerUser(owner.get());
-        hp.setHolderUser(holder);
-
-        // 5. Guardar
-        hpS.insert(hp);
-
-        // 6. Convertir a DTO
-        HealthProfileDTO responseDTO = modelMapper.map(hp, HealthProfileDTO.class);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(hp.getIdHealthProfile())
-                .toUri();
-
-        return ResponseEntity
-                .created(location)
-                .body(responseDTO);
-    }
+    @Operation(summary = "HU07: Listar mis perfiles")
+    public ResponseEntity<List<HealthProfileDTO>> listar() { return ResponseEntity.ok(hpS.list()); }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HealthProfileDTO> buscarPorId(
-            @PathVariable Long id) {
-
-        HealthProfile hp = hpS.listId(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No existe un perfil de salud con el id: " + id
-                        )
-                );
-
-        HealthProfileDTO dto = modelMapper.map(hp, HealthProfileDTO.class);
-
-        return ResponseEntity.ok(dto);
+    @Operation(summary = "HU08: Buscar perfil por ID", description = "Un perfil inexistente o ajeno devuelve 404.")
+    public ResponseEntity<HealthProfileDTO> buscarPorId(@PathVariable @Positive(message = "El ID debe ser positivo") Long id) {
+        return ResponseEntity.ok(hpS.find(id));
     }
 
-    @PutMapping
-    public ResponseEntity<HealthProfileDTO> actualizar(
-            @Valid @RequestBody HealthProfileDTO dto) {
-
-        Optional<HealthProfile> existente =
-                hpS.listId(dto.getIdHealthProfile());
-
-        if (existente.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "No existe un perfil de salud con el id: "
-                            + dto.getIdHealthProfile()
-            );
-        }
-
-        Optional<Users> owner =
-                uS.listId(dto.getIdOwnerUser());
-
-        if (owner.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "No existe el usuario propietario con el id: " + dto.getIdOwnerUser()
-            );
-        }
-
-        Users holder = null;
-
-        if (dto.getIdHolderUser() != null) {
-            Optional<Users> holderOptional =
-                    uS.listId(dto.getIdHolderUser());
-
-            if (holderOptional.isEmpty()) {
-                throw new ResourceNotFoundException(
-                        "No existe el usuario titular con el id: " + dto.getIdHolderUser()
-                );
-            }
-
-            holder = holderOptional.get();
-        }
-
-        // Obtener el perfil existente
-        HealthProfile hp = existente.get();
-
-        // Actualiza los campos
-        hp.setBirthDate(dto.getBirthDate());
-        hp.setSex(dto.getSex());
-        hp.setBloodType(dto.getBloodType());
-        hp.setPhone(dto.getPhone());
-        hp.setActive(dto.getActive());
-
-        // Asignar relaciones
-        hp.setOwnerUser(owner.get());
-        hp.setHolderUser(holder);
-
-        // Guardar
-        hpS.update(hp);
-
-        // Convertir a DTO
-        HealthProfileDTO responseDTO = modelMapper.map(hp, HealthProfileDTO.class);
-
-        return ResponseEntity.ok(responseDTO);
+    @PutMapping("/{id}")
+    @Operation(summary = "HU09: Actualizar perfil", description = "El ID proviene de la URL. No permite transferir el propietario.")
+    public ResponseEntity<HealthProfileDTO> actualizar(@PathVariable @Positive(message = "El ID debe ser positivo") Long id,
+                                                       @Valid @RequestBody HealthProfileRequestDTO request) {
+        return ResponseEntity.ok(hpS.update(id, request));
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "Registro eliminado; sin cuerpo")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-
-        HealthProfile hp = hpS.listId(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No existe un perfil de salud con el id: " + id
-                        )
-                );
-
-        hpS.delete(hp.getIdHealthProfile());
-
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "HU10: Eliminar perfil", description = "Devuelve 409 si hay contactos, documentos u otros registros vinculados.")
+    public ResponseEntity<Void> eliminar(@PathVariable @Positive(message = "El ID debe ser positivo") Long id) {
+        hpS.delete(id); return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/consulta-simple")
+    @Operation(summary = "Consulta simple: mis perfiles por tipo de sangre", description = "Usa findByOwnerUser_IdUserAndBloodTypeOrderByIdHealthProfileAsc. Swagger codifica el + de O+, A+, etc.")
+    public ResponseEntity<List<HealthProfileDTO>> buscarPorSangre(
+            @RequestParam @Pattern(regexp = "^(A|B|AB|O)[+-]$", message = "Usa A+, A-, B+, B-, AB+, AB-, O+ u O-") String bloodType) {
+        return ResponseEntity.ok(hpS.findByBloodType(bloodType));
+    }
+
+    @GetMapping("/consulta-nativa")
+    @Operation(summary = "Consulta nativa: mis perfiles activos", description = "SQL con INNER JOIN. El propietario se obtiene del JWT; no acepta un ID de otra cuenta.")
+    public ResponseEntity<List<HealthProfileDTO>> perfilesActivos() { return ResponseEntity.ok(hpS.activeProfiles()); }
 }

@@ -1,83 +1,56 @@
 package pe.edu.upc.latia_lati.dtos;
 
-import java.time.OffsetDateTime;
-
+import java.time.*;
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class UsersRequestDTO {
-    private Long idUser;
-    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre admite hasta 100 caracteres")
     private String firstName;
 
-    @NotBlank(message = "El apellido del usuario es obligatorio")
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(max = 100, message = "El apellido admite hasta 100 caracteres")
     private String lastName;
 
     @NotBlank(message = "El nombre de usuario es obligatorio")
+    @Pattern(regexp = "[A-Za-z0-9._-]{3,50}", message = "El username debe tener entre 3 y 50 caracteres: letras, números, punto, guion o guion bajo")
     private String username;
 
     @NotBlank(message = "El correo electrónico es obligatorio")
     @Email(message = "El correo electrónico debe tener un formato válido")
+    @Size(max = 150, message = "El correo admite hasta 150 caracteres")
     private String email;
 
+    @JsonAlias("passwordHash")
     @NotBlank(message = "La contraseña es obligatoria")
-    private String passwordHash;
+    @Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres; además no debe exceder 72 bytes UTF-8")
+    private String password;
 
-    @NotNull(message = "El estado activo es obligatorio")
-    private Boolean active;
-
-    public Long getIdUser() {
-        return idUser;
+    public UsersRequestDTO() {
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
+    public UsersRequestDTO(String firstName, String lastName, String username, String email, String password) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
+        this.password = password;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public Boolean getActive() {
-        return active;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
 }
