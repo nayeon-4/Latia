@@ -17,8 +17,7 @@ public interface IEmergencyContactRepository extends JpaRepository<EmergencyCont
 
     // HU69 (join): ficha de emergencia de cada perfil de salud activo con su contacto principal
     // El nombre del paciente sale de users (dueño del perfil)
-@Query(value = "SELECT hp.id_health_profile, u.first_name, u.last_name, hp.blood_type, " +
-        "ec.name, ec.phone, ec.relationship " +
+@Query(value = "SELECT hp.id_health_profile, u.first_name, u.last_name, hp.blood_type, ec.name, ec.phone, ec.relationship " +
         "FROM health_profiles hp " +
         "INNER JOIN users u " +
         "ON u.id_user = hp.id_owner_user " +
