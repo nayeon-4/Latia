@@ -94,4 +94,5 @@ public class HealthProfileDTO {
     public void setActive(Boolean active) {
         this.active = active;
     }
+
 }

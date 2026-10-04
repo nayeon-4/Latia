@@ -33,7 +33,15 @@ public class RoleController {
 
         List<RoleDTO> lista = rS.list()
                 .stream()
-                .map(role -> modelMapper.map(role, RoleDTO.class))
+                .map(role -> {
+                    RoleDTO dto = modelMapper.map(role, RoleDTO.class);
+
+                    if (role.getUser() != null) {
+                        dto.setIdUser(role.getUser().getIdUser());
+                    }
+
+                    return dto;
+                })
                 .toList();
 
         return ResponseEntity.ok(lista);

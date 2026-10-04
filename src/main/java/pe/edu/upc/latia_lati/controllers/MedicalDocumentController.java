@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/medical-documents")
-public class MedicalDocumentsController {
+@RequestMapping("/api/medicaldocuments")
+public class MedicalDocumentController {
     private final IMedicalDocumentsService mdS;
     private final ModelMapper modelMapper;
     private final IHealthProfileService hpS;
 
-    public MedicalDocumentsController(IMedicalDocumentsService mdS, ModelMapper modelMapper, IHealthProfileService hpS) {
+    public MedicalDocumentController(IMedicalDocumentsService mdS, ModelMapper modelMapper, IHealthProfileService hpS) {
         this.mdS = mdS;
         this.modelMapper = modelMapper;
         this.hpS = hpS;
@@ -100,7 +100,7 @@ public class MedicalDocumentsController {
         // 3. Obtener el documento médico existente
         MedicalDocuments medicalDocuments = existente.get();
 
-        // 4. Actualizar sus campos
+        // 4. Actualiza los campos
         medicalDocuments.setTitle(dto.getTitle());
         medicalDocuments.setDocumentType(dto.getDocumentType());
         medicalDocuments.setFileURL(dto.getFileURL());

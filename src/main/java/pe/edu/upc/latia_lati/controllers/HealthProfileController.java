@@ -35,12 +35,19 @@ public class HealthProfileController {
 
         List<HealthProfileDTO> lista = hpS.list()
                 .stream()
-                .map(healthProfile ->
-                        modelMapper.map(
-                                healthProfile,
-                                HealthProfileDTO.class
-                        )
-                )
+                .map(healthProfile -> {
+                    HealthProfileDTO dto = modelMapper.map(healthProfile, HealthProfileDTO.class);
+
+                    if (healthProfile.getOwnerUser() != null) {
+                        dto.setIdOwnerUser(healthProfile.getOwnerUser().getIdUser());
+                    }
+
+                    if (healthProfile.getHolderUser() != null) {
+                        dto.setIdHolderUser(healthProfile.getHolderUser().getIdUser());
+                    }
+
+                    return dto;
+                })
                 .toList();
 
         return ResponseEntity.ok(lista);
@@ -78,8 +85,7 @@ public class HealthProfileController {
         }
 
         // 3. Convertir DTO a entidad
-        HealthProfile hp =
-                modelMapper.map(dto, HealthProfile.class);
+        HealthProfile hp = modelMapper.map(dto, HealthProfile.class);
 
         // 4. Asignar relaciones
         hp.setOwnerUser(owner.get());
@@ -89,8 +95,7 @@ public class HealthProfileController {
         hpS.insert(hp);
 
         // 6. Convertir a DTO
-        HealthProfileDTO responseDTO =
-                modelMapper.map(hp, HealthProfileDTO.class);
+        HealthProfileDTO responseDTO = modelMapper.map(hp, HealthProfileDTO.class);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -123,7 +128,6 @@ public class HealthProfileController {
     public ResponseEntity<HealthProfileDTO> actualizar(
             @Valid @RequestBody HealthProfileDTO dto) {
 
-        // 1. Verificar que el perfil de salud exista
         Optional<HealthProfile> existente =
                 hpS.listId(dto.getIdHealthProfile());
 
@@ -134,7 +138,6 @@ public class HealthProfileController {
             );
         }
 
-        // 2. Verificar que el usuario propietario exista
         Optional<Users> owner =
                 uS.listId(dto.getIdOwnerUser());
 
@@ -144,7 +147,6 @@ public class HealthProfileController {
             );
         }
 
-        // 3. Verificar el usuario titular si fue enviado
         Users holder = null;
 
         if (dto.getIdHolderUser() != null) {
@@ -160,32 +162,31 @@ public class HealthProfileController {
             holder = holderOptional.get();
         }
 
-        // 4. Obtener el perfil existente
+        // Obtener el perfil existente
         HealthProfile hp = existente.get();
 
-        // 5. Actualizar sus campos
+        // Actualiza los campos
         hp.setBirthDate(dto.getBirthDate());
         hp.setSex(dto.getSex());
         hp.setBloodType(dto.getBloodType());
         hp.setPhone(dto.getPhone());
         hp.setActive(dto.getActive());
 
-        // 6. Asignar relaciones
+        // Asignar relaciones
         hp.setOwnerUser(owner.get());
         hp.setHolderUser(holder);
 
-        // 7. Guardar
+        // Guardar
         hpS.update(hp);
 
-        // 8. Convertir a DTO
+        // Convertir a DTO
         HealthProfileDTO responseDTO = modelMapper.map(hp, HealthProfileDTO.class);
 
         return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
         HealthProfile hp = hpS.listId(id)
                 .orElseThrow(() ->
