@@ -1,5 +1,7 @@
 package pe.edu.upc.latia_lati.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -199,4 +201,33 @@ public class HealthProfileController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/consulta-simple")
+    @Operation(summary = "Consulta simple: mis perfiles por tipo de sangre", description = "Escribe O+, A-, etc. en el parámetro bloodType. Solo devuelve perfiles propios.")
+    public ResponseEntity<List<HealthProfileDTO>> buscarPorTipoSangre(@RequestParam String bloodType) {
+        List<HealthProfileDTO> lista = hpS.obtenerPorTipoSangre(bloodType)
+                .stream()
+                .map(this::convertirConsultaDTO)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/consulta-nativa")
+    @Operation(summary = "Consulta nativa: mis perfiles activos", description = "SQL con INNER JOIN y filtro por el propietario autenticado.")
+    public ResponseEntity<List<HealthProfileDTO>> listarActivosPropios() {
+        List<HealthProfileDTO> lista = hpS.listarActivosPropios()
+                .stream()
+                .map(this::convertirConsultaDTO)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    // Mismo mapeo utilizado por el listado de main; aplicado solo a las consultas nuevas.
+    private HealthProfileDTO convertirConsultaDTO(HealthProfile hp) {
+        HealthProfileDTO dto = modelMapper.map(hp, HealthProfileDTO.class);
+        dto.setIdOwnerUser(hp.getOwnerUser().getIdUser());
+        dto.setIdHolderUser(hp.getHolderUser() == null ? null : hp.getHolderUser().getIdUser());
+        return dto;
+    }
+
 }
