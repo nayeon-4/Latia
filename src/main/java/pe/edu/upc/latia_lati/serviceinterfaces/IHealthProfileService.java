@@ -11,4 +11,9 @@ public interface IHealthProfileService {
     public void update(HealthProfile healthProfile);
     public void delete(Long idHealthProfile);
     public Optional<HealthProfile> listId(Long id);
+
+    // Consultas adicionales de los perfiles propios.
+    public List<HealthProfile> obtenerPorTipoSangre(String bloodType);
+    public List<HealthProfile> listarActivosPropios();
+
 }

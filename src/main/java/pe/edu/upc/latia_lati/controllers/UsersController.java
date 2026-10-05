@@ -1,5 +1,8 @@
 package pe.edu.upc.latia_lati.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import pe.edu.upc.latia_lati.dtos.CountHealthProfilesByUserDTO;
+
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -114,4 +117,33 @@ public class UsersController {
         uS.delete(u.getIdUser());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/consulta-simple")
+    @Operation(summary = "Consulta simple: usuarios por estado", description = "Requiere ADMIN. Parámetro active=true o false.")
+    public ResponseEntity<List<UsersResponseDTO>> buscarPorEstado(@RequestParam Boolean active) {
+        List<UsersResponseDTO> lista = uS.obtenerPorEstado(active)
+                .stream()
+                .map(user -> modelMapper.map(user, UsersResponseDTO.class))
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/consulta-nativa")
+    @Operation(summary = "Consulta nativa: total de perfiles por usuario", description = "Requiere ADMIN. SQL con LEFT JOIN y COUNT; incluye usuarios con cero perfiles.")
+    public ResponseEntity<List<CountHealthProfilesByUserDTO>> cantidadPerfilesPorUsuario() {
+        List<CountHealthProfilesByUserDTO> lista = uS.cantidadPerfilesPorUsuario()
+                .stream()
+                .map(resultado -> {
+                    CountHealthProfilesByUserDTO dto = new CountHealthProfilesByUserDTO();
+                    dto.setIdUser(((Number) resultado[0]).longValue());
+                    dto.setFirstName((String) resultado[1]);
+                    dto.setLastName((String) resultado[2]);
+                    dto.setUsername((String) resultado[3]);
+                    dto.setTotalProfiles(((Number) resultado[4]).longValue());
+                    return dto;
+                })
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
 }
