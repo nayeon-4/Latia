@@ -22,10 +22,7 @@ public class MedicationScheduleController {
     private final IMedicationTreatmentService treatmentService;
     private final ModelMapper modelMapper;
 
-    public MedicationScheduleController(
-            IMedicationScheduleService scheduleService,
-            IMedicationTreatmentService treatmentService,
-            ModelMapper modelMapper) {
+    public MedicationScheduleController(IMedicationScheduleService scheduleService, IMedicationTreatmentService treatmentService, ModelMapper modelMapper) {
         this.scheduleService = scheduleService;
         this.treatmentService = treatmentService;
         this.modelMapper = modelMapper;

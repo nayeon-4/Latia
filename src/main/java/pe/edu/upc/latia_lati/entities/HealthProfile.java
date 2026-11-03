@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,7 +21,7 @@ public class HealthProfile {
     @JoinColumn(name = "idOwnerUser", nullable = false)
     private Users ownerUser;
 
-    @OneToOne(optional = true)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "idHolderUser", nullable = true, unique = true)
     private Users holderUser;
 
@@ -46,6 +47,21 @@ public class HealthProfile {
     @UpdateTimestamp
     @Column(name = "updatedAt", nullable = true)
     private OffsetDateTime updatedAt;
+
+    @OneToMany(mappedBy = "healthProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmergencyContact> emergencyContacts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "healthProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClinicalRecord> clinicalRecords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "healthProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicalDocuments> medicalDocuments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "originProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FamilyRelationship>originFamilyRelationships = new ArrayList<>();
+
+    @OneToMany(mappedBy = "relativeProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FamilyRelationship> relativeFamilyRelationships = new ArrayList<>();
 
     public HealthProfile() {
 
@@ -142,5 +158,45 @@ public class HealthProfile {
 
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<EmergencyContact> getEmergencyContacts() {
+        return emergencyContacts;
+    }
+
+    public void setEmergencyContacts(List<EmergencyContact> emergencyContacts) {
+        this.emergencyContacts = emergencyContacts;
+    }
+
+    public List<ClinicalRecord> getClinicalRecords() {
+        return clinicalRecords;
+    }
+
+    public void setClinicalRecords(List<ClinicalRecord> clinicalRecords) {
+        this.clinicalRecords = clinicalRecords;
+    }
+
+    public List<MedicalDocuments> getMedicalDocuments() {
+        return medicalDocuments;
+    }
+
+    public void setMedicalDocuments(List<MedicalDocuments> medicalDocuments) {
+        this.medicalDocuments = medicalDocuments;
+    }
+
+    public List<FamilyRelationship> getOriginFamilyRelationships() {
+        return originFamilyRelationships;
+    }
+
+    public void setOriginFamilyRelationships(List<FamilyRelationship> originFamilyRelationships) {
+        this.originFamilyRelationships = originFamilyRelationships;
+    }
+
+    public List<FamilyRelationship> getRelativeFamilyRelationships() {
+        return relativeFamilyRelationships;
+    }
+
+    public void setRelativeFamilyRelationships(List<FamilyRelationship> relativeFamilyRelationships) {
+        this.relativeFamilyRelationships = relativeFamilyRelationships;
     }
 }

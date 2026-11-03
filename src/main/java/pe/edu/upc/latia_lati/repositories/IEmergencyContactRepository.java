@@ -10,8 +10,6 @@ import java.util.List;
 
 @Repository
 public interface IEmergencyContactRepository extends JpaRepository<EmergencyContact, Long> {
-    List<EmergencyContact> findByHealthProfileIn(List<HealthProfile> healthProfiles);
-
     // HU68 (simple): contactos marcados como principales
     public List<EmergencyContact> findByPrimaryContactTrue();
 

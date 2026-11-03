@@ -47,13 +47,14 @@ public class Users implements Serializable {
     @Column(name = "updatedAt", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(
-            mappedBy = "user",
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Role> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ownerUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HealthProfile> ownedProfiles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "holderUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HealthProfile> heldProfiles = new ArrayList<>();
 
     public Users() {
 
@@ -137,5 +138,21 @@ public class Users implements Serializable {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<HealthProfile> getOwnedProfiles() {
+        return ownedProfiles;
+    }
+
+    public void setOwnedProfiles(List<HealthProfile> ownedProfiles) {
+        this.ownedProfiles = ownedProfiles;
+    }
+
+    public List<HealthProfile> getHeldProfiles() {
+        return heldProfiles;
+    }
+
+    public void setHeldProfiles(List<HealthProfile> heldProfiles) {
+        this.heldProfiles = heldProfiles;
     }
 }

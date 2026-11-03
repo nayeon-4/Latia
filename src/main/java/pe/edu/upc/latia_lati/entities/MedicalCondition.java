@@ -2,6 +2,9 @@ package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "medical_conditions")
 public class MedicalCondition {
@@ -14,6 +17,9 @@ public class MedicalCondition {
 
     @Column(name = "descriptionMedicalCondition", nullable = false, length = 255)
     private String descriptionMedicalCondition;
+
+    @OneToMany(mappedBy = "medicalCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClinicalRecord> clinicalRecords = new ArrayList<>();
 
 
     public MedicalCondition() {
@@ -47,5 +53,13 @@ public class MedicalCondition {
 
     public void setDescriptionMedicalCondition(String descriptionMedicalCondition) {
         this.descriptionMedicalCondition = descriptionMedicalCondition;
+    }
+
+    public List<ClinicalRecord> getClinicalRecords() {
+        return clinicalRecords;
+    }
+
+    public void setClinicalRecords(List<ClinicalRecord> clinicalRecords) {
+        this.clinicalRecords = clinicalRecords;
     }
 }

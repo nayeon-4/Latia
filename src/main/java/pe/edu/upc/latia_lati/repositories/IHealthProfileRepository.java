@@ -12,8 +12,6 @@ import java.util.List;
 
 @Repository
 public interface IHealthProfileRepository extends JpaRepository<HealthProfile, Long> {
-    List<HealthProfile> findByOwnerUserIn(List<Users> users);
-
     // Consulta simple: grupo sanguíneo dentro de los perfiles del dueño autenticado.
     List<HealthProfile> findByOwnerUser_IdUserAndBloodTypeOrderByIdHealthProfileAsc(
             Long idUser, String bloodType);

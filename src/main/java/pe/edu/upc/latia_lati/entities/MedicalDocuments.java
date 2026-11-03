@@ -3,6 +3,8 @@ package pe.edu.upc.latia_lati.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "medical_documents")
@@ -22,6 +24,9 @@ public class MedicalDocuments {
     @ManyToOne
     @JoinColumn(name = "idHealthProfile", nullable = false)
     private HealthProfile healthProfile;
+
+    @OneToMany(mappedBy = "medicalDocument", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClinicalRecordDocument> clinicalRecordDocuments = new ArrayList<>();
 
     public MedicalDocuments() {
 
@@ -82,5 +87,13 @@ public class MedicalDocuments {
 
     public void setHealthProfile(HealthProfile healthProfile) {
         this.healthProfile = healthProfile;
+    }
+
+    public List<ClinicalRecordDocument> getClinicalRecordDocuments() {
+        return clinicalRecordDocuments;
+    }
+
+    public void setClinicalRecordDocuments(List<ClinicalRecordDocument> clinicalRecordDocuments) {
+        this.clinicalRecordDocuments = clinicalRecordDocuments;
     }
 }

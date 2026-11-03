@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface IMedicationScheduleRepository extends JpaRepository<MedicationSchedule, Long> {
-    List<MedicationSchedule> findByTreatmentIn(List<MedicationTreatment> treatments);
     List<MedicationSchedule> findByTreatment_Id(Long treatmentId);
 }

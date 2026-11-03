@@ -10,6 +10,4 @@ import java.util.List;
 
 @Repository
 public interface IMedicationTreatmentRepository extends JpaRepository<MedicationTreatment, Long> {
-    List<MedicationTreatment> findByClinicalRecordIn(List<ClinicalRecord> clinicalRecords);
-    boolean existsByMedication(Medications medication);
 }
