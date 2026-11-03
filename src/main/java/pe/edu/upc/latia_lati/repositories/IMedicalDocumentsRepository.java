@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface IMedicalDocumentsRepository extends JpaRepository<MedicalDocuments, Long> {
-    List<MedicalDocuments> findByHealthProfileIn(List<HealthProfile> healthProfiles);
     public List<MedicalDocuments> findByDocumentDate(LocalDate documentDate);
     @Query(value = """
     SELECT md.*

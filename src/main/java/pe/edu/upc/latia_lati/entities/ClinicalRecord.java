@@ -1,7 +1,10 @@
 package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "clinical_records")
@@ -32,6 +35,17 @@ public class ClinicalRecord {
     @ManyToOne
     @JoinColumn(name = "idCondition", nullable = false)
     private MedicalCondition medicalCondition;
+
+    @OneToMany(mappedBy = "clinicalRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExamResult> examResults = new ArrayList<>();
+
+    // 2. Tratamientos con medicamentos recetados en este registro clínico
+    @OneToMany(mappedBy = "clinicalRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicationTreatment> medicationTreatments = new ArrayList<>();
+
+    // 3. Documentos médicos asociados mediante la tabla intermedia
+    @OneToMany(mappedBy = "clinicalRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClinicalRecordDocument> clinicalRecordDocuments = new ArrayList<>();
 
     public ClinicalRecord() {
     }
@@ -109,5 +123,29 @@ public class ClinicalRecord {
 
     public void setMedicalCondition(MedicalCondition medicalCondition) {
         this.medicalCondition = medicalCondition;
+    }
+
+    public List<ExamResult> getExamResults() {
+        return examResults;
+    }
+
+    public void setExamResults(List<ExamResult> examResults) {
+        this.examResults = examResults;
+    }
+
+    public List<ClinicalRecordDocument> getClinicalRecordDocuments() {
+        return clinicalRecordDocuments;
+    }
+
+    public void setClinicalRecordDocuments(List<ClinicalRecordDocument> clinicalRecordDocuments) {
+        this.clinicalRecordDocuments = clinicalRecordDocuments;
+    }
+
+    public List<MedicationTreatment> getMedicationTreatments() {
+        return medicationTreatments;
+    }
+
+    public void setMedicationTreatments(List<MedicationTreatment> medicationTreatments) {
+        this.medicationTreatments = medicationTreatments;
     }
 }

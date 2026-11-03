@@ -8,5 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface IMedicalConditionRepository extends JpaRepository<MedicalCondition, Long> {
-    Optional<MedicalCondition> findByNameMedicalCondition(String nameMedicalCondition);
 }

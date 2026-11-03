@@ -3,6 +3,7 @@ package pe.edu.upc.latia_lati.entities;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,8 +35,8 @@ public class MedicationTreatment {
     private LocalDate endDate;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "treatment")
-    private List<MedicationSchedule> schedules;
+    @OneToMany(mappedBy = "treatment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicationSchedule> schedules = new ArrayList<>();
 
     public MedicationTreatment() {
     }

@@ -25,11 +25,7 @@ public class MedicationTreatmentController {
     private final IMedicationsService medicationsService;
     private final ModelMapper modelMapper;
 
-    public MedicationTreatmentController(
-            IMedicationTreatmentService treatmentService,
-            IClinicalRecordService clinicalRecordService,
-            IMedicationsService medicationsService,
-            ModelMapper modelMapper) {
+    public MedicationTreatmentController(IMedicationTreatmentService treatmentService, IClinicalRecordService clinicalRecordService, IMedicationsService medicationsService, ModelMapper modelMapper) {
         this.treatmentService = treatmentService;
         this.clinicalRecordService = clinicalRecordService;
         this.medicationsService = medicationsService;

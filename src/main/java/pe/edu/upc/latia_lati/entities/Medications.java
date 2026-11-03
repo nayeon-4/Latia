@@ -2,6 +2,9 @@ package pe.edu.upc.latia_lati.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="medications")
 public class Medications {
@@ -14,6 +17,8 @@ public class Medications {
     private String dosageForm;
     @Column(name = "strength", length = 50)
     private String strength;
+    @OneToMany(mappedBy = "medication", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicationTreatment> medicationTreatments = new ArrayList<>();
     public Medications() {
     }
 
@@ -54,5 +59,13 @@ public class Medications {
 
     public void setStrength(String strength) {
         this.strength = strength;
+    }
+
+    public List<MedicationTreatment> getMedicationTreatments() {
+        return medicationTreatments;
+    }
+
+    public void setMedicationTreatments(List<MedicationTreatment> medicationTreatments) {
+        this.medicationTreatments = medicationTreatments;
     }
 }

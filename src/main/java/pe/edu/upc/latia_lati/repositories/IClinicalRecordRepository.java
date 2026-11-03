@@ -11,8 +11,6 @@ import java.util.List;
 
 @Repository
 public interface IClinicalRecordRepository extends JpaRepository<ClinicalRecord, Long> {
-    List<ClinicalRecord> findByHealthProfileIn(List<HealthProfile> healthProfiles);
-    boolean existsByMedicalCondition(MedicalCondition medicalCondition);
     public List<ClinicalRecord> findByRecordType(String recordType);
     @Query(value = "SELECT mc.name_medical_condition, COUNT(cr.id_clinical_record) " +
             "FROM medical_conditions mc " +

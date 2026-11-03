@@ -22,10 +22,7 @@ public class ExamResultController {
     private final IClinicalRecordService clinicalRecordService;
     private final ModelMapper modelMapper;
 
-    public ExamResultController(
-            IExamResultService examResultService,
-            IClinicalRecordService clinicalRecordService,
-            ModelMapper modelMapper) {
+    public ExamResultController(IExamResultService examResultService, IClinicalRecordService clinicalRecordService, ModelMapper modelMapper) {
         this.examResultService = examResultService;
         this.clinicalRecordService = clinicalRecordService;
         this.modelMapper = modelMapper;
