@@ -3,18 +3,16 @@ package pe.edu.upc.latia_lati.dtos;
 public class LoginResponseDTO {
     private String token;
 
-    private String username;
+    private String email;
 
-    public LoginResponseDTO(String token, String username) {
+    public LoginResponseDTO(String token, String email) {
         this.token = token;
-        this.username = username;
+        this.email = email;
     }
 
     public String getToken() {
         return token;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getEmail() { return email; }
 }

@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface IUsersRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByUsername(String username);
+    Optional<Users> findByEmail(String email);
 
     @Query(value = "SELECT setval(pg_get_serial_sequence('users', 'id_user'), COALESCE((SELECT MAX(id_user) FROM users), 0), true)", nativeQuery = true)
     void syncIdSequence();

@@ -22,13 +22,13 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        Users user = usersRepository.findByUsername(username)
+        Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "Usuario no encontrado: " + username
+                                "Usuario no encontrado con el correo: " + email
                         )
                 );
 
@@ -39,7 +39,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .toList();
 
         return User.builder()
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .password(user.getPasswordHash())
                 .authorities(authorities)
                 .disabled(!Boolean.TRUE.equals(user.getActive()))

@@ -6,7 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,14 +29,15 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // 1. Codificación de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // 2. Proveedor de autenticación
     @Bean
     public AuthenticationProvider authenticationProvider() {
-
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider(userDetailsService);
 
@@ -45,11 +46,10 @@ public class SecurityConfig {
         return provider;
     }
 
+    // 3. Un solo AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(
-            org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration configuration)
-            throws Exception {
-
+            AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -94,12 +94,15 @@ public class SecurityConfig {
         return source;
     }
 
+    // 5. Configuración principal de Spring Security
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
         http
-                .cors(Customizer.withDefaults())
+                .cors(cors ->
+                        cors.configurationSource(corsConfigurationSource())
+                )
 
                 .csrf(csrf -> csrf.disable())
 
@@ -109,27 +112,35 @@ public class SecurityConfig {
                         )
                 )
 
+                .authenticationProvider(authenticationProvider())
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // Login público
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/api/users/registro").permitAll()
-
-                        // Swagger
+                        // Permite las solicitudes previas de CORS
                         .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                HttpMethod.OPTIONS, "/**"
                         ).permitAll()
 
-                        // CORS
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
+                        // Inicio de sesión público
+                        .requestMatchers(
+                                HttpMethod.POST, "/login" ).permitAll()
+                        .requestMatchers("/apis/clinicalrecords", "/apis/clinicalrecords/**").permitAll()
+                        .requestMatchers("/error").permitAll()
 
-                        // Todo lo demás requiere autenticación
+                        // Swagger / OpenAPI
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
+
+                        // Los demás endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )
 
+                // Validación de JWT
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(
