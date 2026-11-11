@@ -11,6 +11,7 @@ public interface IUsersService {
     public void update(Users user);
     public void delete(Long idUser);
     public Optional<Users> listId(Long id);
+    public Optional<Users> findByEmail(String email);
 
     // Consultas adicionales; los métodos CRUD de main se conservan.
     public List<Users> obtenerPorEstado(Boolean active);
