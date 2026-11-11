@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
@@ -118,7 +119,18 @@ public class UsersController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/buscar-por-email")
+    @Operation(summary = "Buscar usuario por correo electrónico")
+    public ResponseEntity<UsersResponseDTO> buscarPorEmail(@RequestParam String email) {
+        Users user = uS.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el correo: " + email));
+
+        UsersResponseDTO dto = modelMapper.map(user, UsersResponseDTO.class);
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping("/consulta-simple")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ADMIN')")
     @Operation(summary = "Consulta simple: usuarios por estado", description = "Requiere ADMIN. Parámetro active=true o false.")
     public ResponseEntity<List<UsersResponseDTO>> buscarPorEstado(@RequestParam Boolean active) {
         List<UsersResponseDTO> lista = uS.obtenerPorEstado(active)
@@ -129,6 +141,7 @@ public class UsersController {
     }
 
     @GetMapping("/consulta-nativa")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ADMIN')")
     @Operation(summary = "Consulta nativa: total de perfiles por usuario", description = "Requiere ADMIN. SQL con LEFT JOIN y COUNT; incluye usuarios con cero perfiles.")
     public ResponseEntity<List<CountHealthProfilesByUserDTO>> cantidadPerfilesPorUsuario() {
         List<CountHealthProfilesByUserDTO> lista = uS.cantidadPerfilesPorUsuario()

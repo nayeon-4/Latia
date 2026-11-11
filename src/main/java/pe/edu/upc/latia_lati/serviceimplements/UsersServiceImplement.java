@@ -1,6 +1,5 @@
 package pe.edu.upc.latia_lati.serviceimplements;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upc.latia_lati.exceptions.BusinessRuleException;
 import pe.edu.upc.latia_lati.exceptions.ResourceNotFoundException;
@@ -48,7 +47,11 @@ public class UsersServiceImplement implements IUsersService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ADMIN')")
+    public Optional<Users> findByEmail(String email) {
+        return uR.findByEmail(email);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Users> obtenerPorEstado(Boolean active) {
         if (active == null) {
@@ -62,7 +65,6 @@ public class UsersServiceImplement implements IUsersService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ADMIN')")
     @Transactional(readOnly = true)
     public List<Object[]> cantidadPerfilesPorUsuario() {
         List<Object[]> resultado = uR.getTotalHealthProfilesByUser();
