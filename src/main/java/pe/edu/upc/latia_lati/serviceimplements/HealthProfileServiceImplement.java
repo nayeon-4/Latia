@@ -82,7 +82,8 @@ public class HealthProfileServiceImplement implements IHealthProfileService {
         if (auth == null || !auth.isAuthenticated()) {
             throw new AccessDeniedException("Inicia sesión para consultar tus perfiles");
         }
-        Users propietario = uR.findByUsername(auth.getName())
+        Users propietario = uR.findByEmail(auth.getName())
+                .or(() -> uR.findByUsername(auth.getName()))
                 .orElseThrow(() -> new AccessDeniedException("La cuenta de la sesión ya no existe"));
         if (!Boolean.TRUE.equals(propietario.getActive())) {
             throw new AccessDeniedException("La cuenta está inactiva");
