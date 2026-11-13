@@ -261,16 +261,30 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void createFamilyRelationships(List<HealthProfile> profiles) {
-        String[] types = {"Hermanos", "Esposos", "Madre e hija", "Padre e hijo", "Primos"};
+        int[][] profileIds = {
+                {1, 2}, {2, 1}, {5, 7}, {7, 5}, {8, 6}, {6, 8}, {10, 11}, {11, 10},
+                {14, 15}, {14, 17}, {17, 15}, {17, 14}, {21, 22}, {22, 11}, {21, 23}, {23, 21},
+                {22, 23}, {23, 22}, {24, 25}, {25, 24}, {27, 29}, {29, 27}, {32, 34}, {34, 32},
+                {35, 36}, {36, 35}, {35, 38}, {38, 35}, {38, 36}, {36, 38}, {40, 42}, {42, 40},
+                {43, 44}, {44, 43}, {46, 47}, {47, 46}, {49, 50}, {50, 49}
+        };
+        String[] types = {
+                "Hermano", "Hermana", "Madre", "Hija", "Padre", "Hijo", "Esposa", "Esposo",
+                "Hija", "Esposa", "Hija", "Esposo", "Primo", "Prima", "Madre", "Hija",
+                "Tía", "Sobrino", "Madre", "Hijo", "Hija", "Madre", "Abuelo", "Nieto",
+                "Hijo", "Madre", "Padre", "Hija", "Nieto", "Abuelo", "Tío", "Sobrino",
+                "Primo", "Prima", "Esposa", "Esposo", "Padre", "Hija"
+        };
         List<FamilyRelationship> list = new ArrayList<>();
 
-        for (int i = 0; i < 50; i++) {
-            int relativeIndex = (i + 1) % 50;
+        for (int i = 0; i < profileIds.length; i++) {
+            int originIndex = profileIds[i][0] - 1;
+            int relativeIndex = profileIds[i][1] - 1;
             list.add(new FamilyRelationship(
                     null,
-                    profiles.get(i),
+                    profiles.get(originIndex),
                     profiles.get(relativeIndex),
-                    types[i % 5]
+                    types[i]
             ));
         }
         familyRelationshipRepository.saveAll(list);
